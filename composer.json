@@ -1,0 +1,26 @@
+{
+  "name": "czfx/czfx",
+  "description": "Semestrální přáce pro předmět KIV/WEB",
+  "minimum-stability": "dev",
+  "license": "proprietary",
+  "authors": [
+    {
+      "name": "Petr Štechmüller",
+      "email": "petr.stechmuller@seznam.cz"
+    },
+    {
+    	"name": "Petr Kraus",
+    	"email": "a.b@c.cz"
+    }
+  ],
+  "require": {
+	"apache/log4php": "2.3.0",
+    "ext-pdo": "*",
+    "ext-mbstring": "*",
+    "ext-openssl": "*",
+    "ext-json": "*"
+  },
+  "autoload": {
+    "classmap": ["app/"]
+  }
+}

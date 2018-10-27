@@ -1,0 +1,8 @@
+/app/config/hidden_config.php
+/app/cache/
+vendor
+public
+composer.lock
+uploads
+/.idea
+composer.phar
