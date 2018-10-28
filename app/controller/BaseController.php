@@ -3,21 +3,26 @@
 namespace app\controller;
 
 
-use app\model\callback\AjaxCallBack;
-use app\model\callback\CallBackData;
 use app\model\service\request\IRequest;
-
+use Logger;
 
 /**
  * Class BaseController
+ * Třída poskytující základní funkce pro všechny kontrolery
  * @package app\controller
  */
 abstract class BaseController {
 
+    private $logger;
     /**
      * @var array $data
      */
     private $data = [];
+
+    public function __construct() {
+        $this->logger = Logger::getLogger(__CLASS__);
+    }
+
 
     /**
      * Přidá data, která putujou ke klientovi
@@ -45,9 +50,27 @@ abstract class BaseController {
      *
      * @param IRequest $request
      */
-    public function defaultAction(IRequest $request) {
-        $this->addData("controller", $request->getController());
-        $this->addData("action", $request->getAction());
+//    public function defaultAction(IRequest $request) {
+//        $this->logger->info("Výchozí akce kontroleru.");
+//        $this->addData("controller", $request->getController());
+//        $this->addData("action", $request->getAction());
+//        $this->addData("data", $request->getParams());
+//    }
+
+    public function defaultGETAction(IRequest $request) {
+        $this->logger->info("defaultGETAction");
+    }
+
+    public function defaultPOSTAction(IRequest $request) {
+        $this->logger->info("defaultPOSTAction");
+    }
+
+    public function defaultPUTAction(IRequest $request) {
+        $this->logger->info("defaultPUTAction");
+    }
+
+    public function defaultDELETEAction(IRequest $request) {
+        $this->logger->info("defaultDELETEAction");
     }
 
     protected function sendResponce() {

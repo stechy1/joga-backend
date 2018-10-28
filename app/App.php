@@ -8,6 +8,7 @@ use app\model\database\IDatabase;
 use app\model\factory\RequestFactory;
 use app\model\service\Container;
 use app\model\service\request\IRequest;
+use Logger;
 
 
 /**
@@ -17,22 +18,28 @@ use app\model\service\request\IRequest;
  */
 class App {
 
+    private $logger;
+
     /**
      * @var Container
      */
     private $container;
+
+    public function __construct() {
+        $this->logger = Logger::getLogger(__CLASS__);
+    }
 
     public function run() {
         /**
          * @var IDatabase $database
          */
         $database = $this->container->getInstanceOf('database');
-//        try {
-//            $database->connect(DATABASE_HOST, DATABASE_LOGIN, DATABASE_PASS, DATABASE_SCHEME);
-//        } catch (\PDOException $ex) {
-//            echo "Nepodarilo se pripojit k databazi. Ukoncuji relaci.";
-//            exit(1);
-//        }
+        try {
+            $database->connect(DATABASE_HOST, DATABASE_LOGIN, DATABASE_PASS, DATABASE_SCHEME);
+        } catch (\PDOException $ex) {
+            $this->logger->fatal("Nepodarilo se pripojit k databazi. Ukoncuji relaci.");
+            exit(1);
+        }
 
         /**
          * @var $router RouterController
@@ -52,8 +59,7 @@ class App {
         if (substr_count($request->getController(), "api") === 0) {
             include __DIR__ . '/../public/index.html';
         } else {
-            header("Access-Control-Allow-Origin: *");
-            $router->defaultAction($reqFactory->createHttpRequest());
+            $router->defaultAction($request);
         }
     }
 }

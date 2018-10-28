@@ -3,9 +3,7 @@
 namespace app\model\manager;
 
 use app\model\database\Database;
-use app\model\factory\UserFactory;
 use app\model\service\exception\MyException;
-use app\model\util\SimpleImage;
 use app\model\util\StringUtils;
 use PDOException;
 

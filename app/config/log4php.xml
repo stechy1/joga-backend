@@ -9,5 +9,6 @@
   </appender>
   <root>
     <appender_ref ref="default"/>
+    <level value="TRACE" />
   </root>
 </configuration>

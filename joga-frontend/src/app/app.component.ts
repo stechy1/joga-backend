@@ -12,7 +12,7 @@ export class AppComponent implements OnInit {
   constructor(private http: HttpClient) {}
 
   ngOnInit(): void {
-    this.http.delete('/api/fun/article')
+    this.http.get('/api/admin/dashboard/users')
         .toPromise()
         .then(value => {
           console.log(value);

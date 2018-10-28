@@ -19,8 +19,14 @@ interface IRequest {
      * Získá název akce, která se má provést v kontroleru
      *
      * @return string Vrátí název akce, která se má provést
+     * Struktura názvu:
+     *   název metoda
+     *         metoda = [HEAD, GET, POST, PUT, DELETE]
+     *   UserGET, UserPOST, UserPUT, UserDELETE
      */
     function getAction();
+
+    function getDefaultAction();
 
     /**
      * Vrátí hodnotu uloženou v postu na daném klíči. Pokud hodnota neexistuje, vrátí výchozí hodnotu
