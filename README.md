@@ -1,19 +1,19 @@
-#Webová aplikace
+# Webová aplikace
 
-##Požadavky
+## Požadavky
 - PHP >=7.1
 - Angular 7
 - Composer
 
-##Nastavení PHP části
-###Instalace composeru
+## Nastavení PHP části
+### Instalace composeru
 Použijte instalační skript na této stránce
 https://getcomposer.org/download/ --> _Command-line installation_. 
 Vygeneruje se soubor "composer.phar". 
 Poté zavoláš příkaz `php composer.phar install`, 
 čímž se vygeneruje složka vendor.
 
-###Nastavení VHosts během vývoje
+### Nastavení VHosts během vývoje
 Silně doporučuji nastavit si vhost, aby jsi neměl problémy s překladem adres.
 Pro správnou funkčnost je potřeba mít 
 správně nakonfigurovaný soubor `apache\apache2.4.35\conf\httpd.conf`:
@@ -41,12 +41,12 @@ Dále musíš upravit soubor `c:\Windows\System32\drivers\etc\hosts` kam přidá
 ```
 Nakonec restartuješ Apache a měl by jsi mít funkční vhost.
 
-##Nastavení Angularu
-###Hostování angular aplikace
+## Nastavení Angularu
+### Hostování angular aplikace
 Ve složce `joga-frontend` zavoláš postupně příkazy: `npm install` a `ng serve`. Těmito příkazy
 se nejdříve nainstalují veškeré závislosti a příkazem `serve` se začne hostovat výsledná aplikace.
 
-###Sestavení angular aplikace
+### Sestavení angular aplikace
 Ve složce `joga-frontend` zavoláš příkaz `ng build --prod --base-href="/public/"` 
 čímž se vygeneruje složka _dist_ s výslednou aplikací. Vedle souboru **index.php** vytvoříš složku
 _public_, do které nakopíruješ obsah složky _dist_. 
