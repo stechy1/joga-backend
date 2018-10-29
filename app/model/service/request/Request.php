@@ -35,7 +35,7 @@ class Request implements IRequest {
         $this->data = $data;
         $this->files = $files;
 
-        $this->logger->trace("asdfByl vytvořen nový request: " . $this->__toString());
+        $this->logger->trace("Byl vytvořen nový request: " . $this->__toString());
     }
 
     function getController() {
