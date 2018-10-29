@@ -54,11 +54,11 @@ class Container {
     private function loadMap($folder, $loadAnyway = false) {
         $root = $_SERVER['DOCUMENT_ROOT'];
         $cacheFile = $root . "/app/cache/map.php";
-        $this->clasess = array();
         if (file_exists($cacheFile) && !$loadAnyway) {
             /** @noinspection PhpIncludeInspection */
             $this->clasess = require $cacheFile;
         } else {
+            $this->clasess = array();
             $string = "<?php " . PHP_EOL . "return array(" . PHP_EOL;
             foreach (new FileFilterIterator(new RecursiveIteratorIterator(new RecursiveDirectoryIterator($folder))) as $fileInfo) {
                 $pathName = $fileInfo->getPathname();
