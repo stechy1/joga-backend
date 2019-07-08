@@ -9,18 +9,21 @@
       "email": "petr.stechmuller@seznam.cz"
     },
     {
-    	"name": "Petr Kraus",
-    	"email": "a.b@c.cz"
+      "name": "Petr Kraus",
+      "email": "a.b@c.cz"
     }
   ],
   "require": {
-	"apache/log4php": "2.3.0",
+    "apache/log4php": "2.3.0",
     "ext-pdo": "*",
     "ext-mbstring": "*",
     "ext-openssl": "*",
-    "ext-json": "*"
+    "ext-json": "*",
+    "rbdwllr/reallysimplejwt": "dev-master"
   },
   "autoload": {
-    "classmap": ["app/"]
+    "classmap": [
+      "app/"
+    ]
   }
 }
