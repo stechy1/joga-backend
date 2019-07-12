@@ -1,9 +1,0 @@
-{
-  "/api/*": {
-    "target": "http://joga.lh",
-    "secure": false,
-    "logLevel": "debug",
-    "changeOrigin": true,
-    "pathRewrite": {"^/api" : "http://joga.lh/api"}
-  }
-}
