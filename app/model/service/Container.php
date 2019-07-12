@@ -7,7 +7,8 @@ use Exception;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use ReflectionClass;
-use SplFileInfo;
+use ReflectionException;
+use stdClass;
 
 class Container {
 
@@ -21,7 +22,7 @@ class Container {
      * Container constructor.
      */
     private function __construct() {
-        $this->map = new \stdClass();
+        $this->map = new stdClass();
     }
 
     /**
@@ -80,6 +81,7 @@ class Container {
      * @param $obj object Injektovaný objekt
      * @param $reflection ReflectionClass Reflexní třída pro injektovaný objekt
      * @return object
+     * @throws ReflectionException
      */
     private function injectClass($obj, $reflection) {
         if ($doc = $reflection->getDocComment()) {
@@ -172,6 +174,7 @@ class Container {
      * @param $className string Název třídy, kterou chcete získat
      * @param null $arguments Případné argumenty
      * @return object|null Null, pokud instanci není možné vytvořit, jinak referenci na objekt
+     * @throws ReflectionException
      */
     public function getInstanceOf($className, $arguments = null) {
         $className = strtolower($className);

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "8fe8468a8de6d6e331f6ce9a76fddaa1",
+    "content-hash": "aa06efeaa80659fc4c36dced02f497b0",
     "packages": [
         {
             "name": "apache/log4php",
@@ -37,36 +37,77 @@
             "time": "2012-10-26T09:13:25+00:00"
         },
         {
-            "name": "rbdwllr/reallysimplejwt",
+            "name": "firebase/php-jwt",
             "version": "dev-master",
             "source": {
                 "type": "git",
-                "url": "https://github.com/RobDWaller/ReallySimpleJWT.git",
-                "reference": "5196b0bb2058321b1ca5703d0946a8cfa0401b09"
+                "url": "https://github.com/firebase/php-jwt.git",
+                "reference": "bac0422822b92fe7a0ed1fc7b1b633d9efa37bae"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/RobDWaller/ReallySimpleJWT/zipball/5196b0bb2058321b1ca5703d0946a8cfa0401b09",
-                "reference": "5196b0bb2058321b1ca5703d0946a8cfa0401b09",
+                "url": "https://api.github.com/repos/firebase/php-jwt/zipball/bac0422822b92fe7a0ed1fc7b1b633d9efa37bae",
+                "reference": "bac0422822b92fe7a0ed1fc7b1b633d9efa37bae",
                 "shasum": ""
             },
             "require": {
-                "php": ">=7.1.0"
+                "php": ">=5.3.0"
             },
             "require-dev": {
-                "infection/infection": "^0.12.2",
-                "phploc/phploc": "^4.0",
-                "phpmd/phpmd": "2.6.*",
-                "phpstan/phpstan": "^0.10",
-                "phpunit/phpunit": "^7.0",
-                "squizlabs/php_codesniffer": "^3.0"
+                "phpunit/phpunit": " 4.8.35"
             },
             "type": "library",
             "autoload": {
                 "psr-4": {
-                    "ReallySimpleJWT\\": "src",
-                    "Tests\\": "tests"
+                    "Firebase\\JWT\\": "src"
                 }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Neuman Vong",
+                    "email": "neuman+pear@twilio.com",
+                    "role": "Developer"
+                },
+                {
+                    "name": "Anant Narayanan",
+                    "email": "anant@php.net",
+                    "role": "Developer"
+                }
+            ],
+            "description": "A simple library to encode and decode JSON Web Tokens (JWT) in PHP. Should conform to the current spec.",
+            "homepage": "https://github.com/firebase/php-jwt",
+            "time": "2018-01-26T19:13:29+00:00"
+        },
+        {
+            "name": "ralouphie/getallheaders",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/ralouphie/getallheaders.git",
+                "reference": "120b605dfeb996808c31b6477290a714d356e822"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/ralouphie/getallheaders/zipball/120b605dfeb996808c31b6477290a714d356e822",
+                "reference": "120b605dfeb996808c31b6477290a714d356e822",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.6"
+            },
+            "require-dev": {
+                "php-coveralls/php-coveralls": "^2.1",
+                "phpunit/phpunit": "^5 || ^6.5"
+            },
+            "type": "library",
+            "autoload": {
+                "files": [
+                    "src/getallheaders.php"
+                ]
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
@@ -74,27 +115,20 @@
             ],
             "authors": [
                 {
-                    "name": "Rob Waller",
-                    "email": "rdwaller1984@gmail.com"
+                    "name": "Ralph Khattar",
+                    "email": "ralph.khattar@gmail.com"
                 }
             ],
-            "description": "A really simple library to generate user authentication JSON Web Tokens.",
-            "keywords": [
-                "Authentication",
-                "json",
-                "json web tokens",
-                "jwt",
-                "php",
-                "tokens"
-            ],
-            "time": "2019-06-27T10:01:36+00:00"
+            "description": "A polyfill for getallheaders.",
+            "time": "2019-03-08T08:55:37+00:00"
         }
     ],
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "dev",
     "stability-flags": {
-        "rbdwllr/reallysimplejwt": 20
+        "firebase/php-jwt": 20,
+        "ralouphie/getallheaders": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,

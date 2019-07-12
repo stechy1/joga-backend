@@ -35,6 +35,12 @@ class RouterController extends BaseController {
         $this->logger = Logger::getLogger(__CLASS__);
     }
 
+    private function extractJWT() {
+
+    }
+
+
+
     /**
      * Výchozí akce kontroleru
      * @param IRequest $request

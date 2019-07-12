@@ -27,12 +27,20 @@ abstract class BaseController {
     /**
      * Přidá data, která putujou ke klientovi
      *
-     * @param string $value
+     * @param string $key
      * @param mixed $value
      * @param bool $jsonEncode False, pokud se nemají data enkodovat do jsonu, výchozi je true
      */
     protected function addData(string $key, $value, $jsonEncode = true) {
-        $this->data[$key] = ($jsonEncode) ? json_encode($value) : $value;
+        if ($jsonEncode || is_object($value)) {
+            $this->data[$key] = json_encode($value);
+        }
+
+        $this->data[$key] = $value;
+    }
+
+    protected function checkUser() {
+
     }
 
     /**

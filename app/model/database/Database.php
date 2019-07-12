@@ -3,6 +3,7 @@
 namespace app\model\database;
 
 
+use Logger;
 use PDO;
 
 /**
@@ -12,6 +13,10 @@ use PDO;
  */
 class Database implements IDatabase {
 
+    /**
+     * @var Logger
+     */
+    private $logger;
     /**
      * Databázové spojení
      * @var PDO
@@ -24,6 +29,13 @@ class Database implements IDatabase {
      * @var array
      */
     private static $settings = array(PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8", PDO::ATTR_EMULATE_PREPARES => false);
+
+    /**
+     * Database constructor.
+     */
+    public function __construct() {
+        $this->logger = Logger::getLogger(__CLASS__);
+    }
 
     /**
      * Připojí se k databázi pomocí daných údajů
@@ -89,6 +101,7 @@ class Database implements IDatabase {
      * @return int Počet ovlivněných řádek
      */
     public function query($query, $parameters = array()) {
+        $this->logger->trace($query);
         $result = $this->connection->prepare($query);
         $result->execute($parameters);
         return $result->rowCount();

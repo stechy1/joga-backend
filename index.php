@@ -4,7 +4,7 @@
 use app\App;
 use app\model\service\Container;
 
-session_start();
+//session_start();
 
 define("__HOME__", $_SERVER['REQUEST_SCHEME'] . "://" . $_SERVER['HTTP_HOST']);
 

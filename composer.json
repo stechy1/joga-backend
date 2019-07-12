@@ -19,7 +19,8 @@
     "ext-mbstring": "*",
     "ext-openssl": "*",
     "ext-json": "*",
-    "rbdwllr/reallysimplejwt": "dev-master"
+    "firebase/php-jwt": "dev-master",
+    "ralouphie/getallheaders": "dev-master"
   },
   "autoload": {
     "classmap": [
