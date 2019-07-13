@@ -9,6 +9,7 @@ use app\model\factory\RequestFactory;
 use app\model\service\Container;
 use app\model\service\request\IRequest;
 use Logger;
+use PDOException;
 
 
 /**
@@ -36,7 +37,7 @@ class App {
         $database = $this->container->getInstanceOf('database');
         try {
             $database->connect(DATABASE_HOST, DATABASE_LOGIN, DATABASE_PASS, DATABASE_SCHEME);
-        } catch (\PDOException $ex) {
+        } catch (PDOException $ex) {
             $this->logger->fatal("Nepodarilo se pripojit k databazi. Ukoncuji relaci.");
             exit(1);
         }
