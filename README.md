@@ -5,15 +5,14 @@
 - Angular 7
 - Composer
 
-## Nastavení PHP části
-### Instalace composeru
+## Instalace composeru
 Použijte instalační skript na této stránce
 https://getcomposer.org/download/ --> _Command-line installation_. 
 Vygeneruje se soubor "composer.phar". 
 Poté zavoláš příkaz `php composer.phar install`, 
 čímž se vygeneruje složka vendor.
 
-### Nastavení VHosts během vývoje
+## Nastavení VHosts během vývoje
 Silně doporučuji nastavit si vhost, aby jsi neměl problémy s překladem adres.
 Pro správnou funkčnost je potřeba mít 
 správně nakonfigurovaný soubor `apache\apache2.4.35\conf\httpd.conf`:
@@ -41,13 +40,30 @@ Dále musíš upravit soubor `c:\Windows\System32\drivers\etc\hosts` kam přidá
 ```
 Nakonec restartuješ Apache a měl by jsi mít funkční vhost.
 
-## Nastavení Angularu
-### Hostování angular aplikace
-Ve složce `joga-frontend` zavoláš postupně příkazy: `npm install` a `ng serve`. Těmito příkazy
-se nejdříve nainstalují veškeré závislosti a příkazem `serve` se začne hostovat výsledná aplikace.
+## Nastavení konfigurace serveru
+- Ve složce `app` vytvoř složku `cache`.
+- Ve složce `app/config` založ soubor `hidden_config.php` 
+podle následující kostry a vyplň ji odpovídajícímí údaji:
+```
+<?php
 
-### Sestavení angular aplikace
-Ve složce `joga-frontend` zavoláš příkaz `ng build --prod --base-href="/public/"` 
-čímž se vygeneruje složka _dist_ s výslednou aplikací. Vedle souboru **index.php** vytvoříš složku
-_public_, do které nakopíruješ obsah složky _dist_. 
-Tímto způsobem se bude hostovat angular aplikace pomocí PHP serveru.
+define('DATABASE_HOST', 'vypln');
+define('DATABASE_LOGIN', 'vypln');
+define('DATABASE_PASS', 'vypln');
+define('DATABASE_SCHEME', 'vypln');
+define('JWT_ISSUER', 'vypln');
+```
+- Založ novou složku `public` v kořeni backend projektu.
+- Vygeneruj si veřejný privátní klíč například pomocí nástroje `puTTY Key Generator`.
+  - Veřejný klíč ulož do souboru `public/public.key`.
+  - Privání klíč ulož do souboru `app/config/private.key`.
+  
+  Nyní nasimuluj jeden požadavek na server. Požadavek dopadne špatně, 
+  ale ve složce `app/cache` se vytvoří soubor `map.php`. 
+  
+  Od této chvíle by měl být server schopný provozu.
+  
+  ## Tipy & triky
+  Kdykoliv založíš novou třídu, je bohužel nutné zavolat v příkazovém řádku: 
+  `composer update` pro aktualizování cache autoloaderu.
+  

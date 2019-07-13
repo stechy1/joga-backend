@@ -35,7 +35,7 @@ class JSWManager {
     }
 
     public function createJSW(User $user): string {
-        $issuer_claim = JSW_ISSUER;
+        $issuer_claim = JWT_ISSUER;
         $time = new DateTime();
         $issuedat_claim = $time->getTimestamp() * 1000;
         $time->add(new DateInterval("PT2H"));
