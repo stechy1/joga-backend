@@ -78,7 +78,14 @@ class RouterController extends BaseController {
         $this->logger->trace("Controller -> onExit().");
         $this->controller->onExit();
 
+        $this->sendResponce();
+    }
+
+    protected function sendResponce() {
         $this->logger->trace("Odesílám odpověď.");
+        $this->logger->trace(json_encode($this->data));
         $this->controller->sendResponce();
     }
+
+
 }

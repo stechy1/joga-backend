@@ -17,12 +17,15 @@ abstract class BaseController {
     /**
      * @var array $data
      */
-    private $data = [];
+    protected $data = [];
+    /**
+     * @var int
+     */
+    private $code = -1;
 
     public function __construct() {
         $this->logger = Logger::getLogger(__CLASS__);
     }
-
 
     /**
      * Přidá data, která putujou ke klientovi
@@ -43,27 +46,32 @@ abstract class BaseController {
 
     }
 
+    protected function setCode(int $code) {
+        if (!$this->code == -1) {
+            http_response_code($code);
+            $this->code = $code;
+        }
+    }
+
+    protected function setHeader(string $name, string $value) {
+        if ($value === null) {
+            header_remove($name);
+        } else {
+            header($name . ': ' . $value, true, $this->code);
+        }
+    }
+
     /**
      * Provede se před hlavním zpracováním požadavku v kontroleru
      */
-    public function onStartup() {}
+    public function onStartup() {
+    }
 
     /**
      * Provede se po zpracování hlavního požadavku v kontroleru
      */
-    public function onExit() {}
-
-    /**
-     * Výchozí akce kontroleru
-     *
-     * @param IRequest $request
-     */
-//    public function defaultAction(IRequest $request) {
-//        $this->logger->info("Výchozí akce kontroleru.");
-//        $this->addData("controller", $request->getController());
-//        $this->addData("action", $request->getAction());
-//        $this->addData("data", $request->getParams());
-//    }
+    public function onExit() {
+    }
 
     public function defaultGETAction(IRequest $request) {
         $this->logger->info("defaultGETAction");
@@ -81,7 +89,5 @@ abstract class BaseController {
         $this->logger->info("defaultDELETEAction");
     }
 
-    protected function sendResponce() {
-        echo json_encode($this->data);
-    }
+    protected abstract function sendResponce();
 }

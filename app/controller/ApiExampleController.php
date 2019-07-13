@@ -5,7 +5,7 @@ namespace app\controller;
 
 use Logger;
 
-class ApiExampleController extends BaseController {
+class ApiExampleController extends BaseApiController {
 
 private $logger;
 
@@ -13,6 +13,5 @@ private $logger;
         parent::__construct();
         $this->logger = Logger::getLogger(__CLASS__);
     }
-
 
 }

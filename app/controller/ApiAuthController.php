@@ -7,6 +7,7 @@ namespace app\controller;
 use app\model\manager\UserManager;
 use app\model\service\exception\UserException;
 use app\model\service\request\IRequest;
+use app\model\util\StatusCodes;
 use Logger;
 
 /**
@@ -14,7 +15,7 @@ use Logger;
  * @Inject UserManager
  * @package app\controller
  */
-class ApiAuthController extends BaseController {
+class ApiAuthController extends BaseApiController {
 
     private $logger;
 
@@ -31,10 +32,9 @@ class ApiAuthController extends BaseController {
     public function registerPOSTAction(IRequest $request) {
         try {
             $this->usermanager->register($request->get('email'), $request->get('password'));
-            $this->addData('result', 'success');
         } catch (UserException $ex) {
             $this->logger->error($ex);
-            $this->addData('result', 'fail');
+            $this->setCode(StatusCodes::PRECONDITION_FAILED);
         }
     }
 
@@ -44,11 +44,10 @@ class ApiAuthController extends BaseController {
     public function loginPOSTAction(IRequest $request) {
         try {
             $jwt = $this->usermanager->login($request->get('email'), $request->get('password'));
-            $this->addData('result', 'success');
             $this->addData('jwt', $jwt);
         } catch (UserException $ex) {
             $this->logger->error($ex);
-            $this->addData('result', 'fail');
+            $this->setCode(StatusCodes::PRECONDITION_FAILED);
         }
     }
 }

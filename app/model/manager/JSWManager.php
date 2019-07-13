@@ -4,8 +4,9 @@
 namespace app\model\manager;
 
 
-use app\model\JWTModel;
 use app\model\User;
+use DateInterval;
+use DateTime;
 use Firebase\JWT\JWT;
 use Logger;
 
@@ -35,9 +36,10 @@ class JSWManager {
 
     public function createJSW(User $user): string {
         $issuer_claim = JSW_ISSUER;
-        $issuedat_claim = time(); // issued at
-        $notbefore_claim = $issuedat_claim + 10; //not before in seconds
-        $expire_claim = $issuedat_claim + 60; // expire time in seconds
+        $time = new DateTime();
+        $issuedat_claim = $time->getTimestamp(); // issued at
+        $notbefore_claim = $time->add(new DateInterval("PT10M")); //not before in seconds
+        $expire_claim = $time->add(new DateInterval("PT2H")); // expire time in seconds
         $token = array(
             "iss" => $issuer_claim,    // A string containing the name or symbol of the institution application. are often a website name and may be accustomed discard tokens from alternative applications.
             "iat" => $issuedat_claim,  // timestamp of token supplying.

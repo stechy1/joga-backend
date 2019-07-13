@@ -7,6 +7,7 @@ use app\model\service\Container;
 //session_start();
 
 define("__HOME__", $_SERVER['REQUEST_SCHEME'] . "://" . $_SERVER['HTTP_HOST']);
+date_default_timezone_set('Europe/Prague');
 
 $loader = require "vendor/autoload.php";
 
