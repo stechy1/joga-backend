@@ -37,14 +37,13 @@ class JSWManager {
     public function createJSW(User $user): string {
         $issuer_claim = JSW_ISSUER;
         $time = new DateTime();
-        $issuedat_claim = $time->getTimestamp(); // issued at
-        $notbefore_claim = $time->add(new DateInterval("PT10M")); //not before in seconds
-        $expire_claim = $time->add(new DateInterval("PT2H")); // expire time in seconds
+        $issuedat_claim = $time->getTimestamp() * 1000;
+        $time->add(new DateInterval("PT2H"));
+        $expire_claim = $time->getTimestamp() * 1000;
         $token = array(
-            "iss" => $issuer_claim,    // A string containing the name or symbol of the institution application. are often a website name and may be accustomed discard tokens from alternative applications.
-            "iat" => $issuedat_claim,  // timestamp of token supplying.
-            "nbf" => $notbefore_claim, // It is the timestamp when we start token should and considering it valid. It should be equal to or greater than iat. In this case , after issuing the token, it will be valid for 10 seconds.
-            "exp" => $expire_claim,    // Timestamp of once the token ought to stop to be valid. Ought to be larger than iat and nbf. During this case, the token can expire sixty seconds once being issued.
+            "iss" => $issuer_claim,    // Název vlastníka tokenu (název aplikace)
+            "iat" => $issuedat_claim,  // Timestamp času, kdy byl token vygenerován
+            "exp" => $expire_claim,    // Timestamp času, kdy vyprší platnost tokenu
             "id" => $user->getId()
         );
         $privKey = $this->readPrivateKey();
