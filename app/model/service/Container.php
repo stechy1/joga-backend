@@ -4,6 +4,7 @@ namespace app\model\service;
 
 
 use Exception;
+use Logger;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use ReflectionClass;
@@ -53,14 +54,17 @@ class Container {
     }
 
     private function loadMap($folder, $loadAnyway = false) {
-        $cacheFile = "app\\cache\\map.php";
+        $cacheFile = "app/cache/map.php";
         $this->clasess = array();
         if (file_exists($cacheFile) && !$loadAnyway) {
             /** @noinspection PhpIncludeInspection */
             $this->clasess = require $cacheFile;
         } else {
+            $root = $_SERVER['DOCUMENT_ROOT'] . "/";
             $string = "<?php " . PHP_EOL . "return array(" . PHP_EOL;
-            $root = str_replace('/', '\\', $_SERVER['DOCUMENT_ROOT']);
+            if (__IS_WINDOWS__) {
+                $root = str_replace('/', '\\', $root);
+            }
             foreach (new FileFilterIterator(new RecursiveIteratorIterator(new RecursiveDirectoryIterator($folder))) as $fileInfo) {
                 $pathName = $fileInfo->getPathname();
 
@@ -68,6 +72,7 @@ class Container {
 
                 $file = strtolower($fileInfo->getBasename('.php'));
                 $filePath = str_replace('.php', '', $filePath);
+                $filePath = str_replace("/", "\\", $filePath);
                 $this->clasess[$file] = $filePath;
                 $string .= "\t'$file' => '$filePath'," . PHP_EOL;
             }

@@ -2,5 +2,8 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="$PROJECT_DIR$" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/vendor/apache/log4php" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/vendor/firebase/php-jwt" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/vendor/ralouphie/getallheaders" vcs="Git" />
   </component>
 </project>
