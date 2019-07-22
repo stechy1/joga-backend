@@ -59,6 +59,7 @@ class Database implements IDatabase {
      * @return array|null Asociativní pole obsahující data odpovídající záznamu, nebo null
      */
     public function queryOne($query, $parameters = array()) {
+        $this->logger->trace($query);
         $result = $this->connection->prepare($query);
         $result->execute($parameters);
         return $result->fetch(PDO::FETCH_ASSOC);
@@ -72,6 +73,7 @@ class Database implements IDatabase {
      * @return array|null Asociativní pole obsahující data odpovídající záznamu, nebo null
      */
     public function queryAll($query, $parameters = array()) {
+        $this->logger->trace($query);
         $result = $this->connection->prepare($query);
         $result->execute($parameters);
         return $result->fetchAll(PDO::FETCH_ASSOC);
