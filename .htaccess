@@ -14,6 +14,9 @@
 	# front controller
 	RewriteCond %{REQUEST_FILENAME} !-f
 	RewriteCond %{REQUEST_FILENAME} !-d
+
+  RewriteRule \.(?:jpe?g|gif|bmp|png|css|js|ico)$ /public/%{REQUEST_URI} [L, R=302,NC]
+
 	RewriteRule !\.(pdf|js|ico|gif|jpg|png|css|rar|zip|tar\.gz|map)$ index.php [L]
 
 </IfModule>
