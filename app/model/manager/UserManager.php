@@ -64,32 +64,26 @@ class UserManager {
      *
      * @param $email
      * @param $password
-     * @return JWTModel
-     * @throws UserException () Pokud se přihlášení nezdaří
+     * @return string JWT řetěžec
+     * @throws UserException Pokud se přihlášení nezdaří
      */
     public function login($email, $password): string {
-
 //        Získání údajů
         $fromDb = $this->database->queryOne('
-                        SELECT id, password
+                        SELECT id, password, role
                         FROM users
                         WHERE email = ?
                 ', [$email]);
         if (!$fromDb) throw new UserException('Špatné jméno nebo heslo.');
 
-//        Ověření hesla
+//      Ověření hesla
         $hash = $fromDb['password'];
         if (!password_verify($password, $hash)) {
             throw new UserException('Špatné jméno nebo heslo.');
         }
 
-        return $this->jswmanager->createJSW(new User($fromDb['id'], $email, null));
-
-//        return $this->createJSW(new User($fromDb['id'], $fromDb['email'], null));
+        return $this->jswmanager->createJSW(new User($fromDb['id'], $email, $fromDb['role'], null));
 
     }
 
-//    public function verifyJSW(string $token) {
-//        return Token::validate($token, self::JSW_SECRET);
-//    }
 }

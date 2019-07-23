@@ -44,7 +44,8 @@ class JSWManager {
             "iss" => $issuer_claim,    // Název vlastníka tokenu (název aplikace)
             "iat" => $issuedat_claim,  // Timestamp času, kdy byl token vygenerován
             "exp" => $expire_claim,    // Timestamp času, kdy vyprší platnost tokenu
-            "id" => $user->getId()
+            "id" => $user->getId(),    // ID uživatele
+            "role" => $user->getRole() // Role uživatele
         );
         $privKey = $this->readPrivateKey();
         return JWT::encode($token, $privKey, self::JSW_ALGORITHM);

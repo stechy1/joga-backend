@@ -74,4 +74,11 @@ interface IRequest {
      * @return boolean True, pokud požadavek obsahuje nějaké uživatelem nahrané soubory, jinak false
      */
     function hasFiles();
+
+    /**
+     * Vrátí hlavičky obsazené v požadavku
+     *
+     * @return string[] Pole se všemi hlavičkami, které přišly spolu s požadavkem
+     */
+    function getHeaders();
 }

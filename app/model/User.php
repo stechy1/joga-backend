@@ -18,11 +18,16 @@ class User {
      * @var string
      */
     private $password;
+    /**
+     * @var int
+     */
+    private $role;
 
-    public function __construct(int $id, string $email, string $password = null) {
+    public function __construct(int $id, string $email, int $role, string $password = null) {
         $this->id = $id;
         $this->email = $email;
         $this->password = $password;
+        $this->role = $role;
     }
 
     /**
@@ -46,5 +51,11 @@ class User {
         return $this->password;
     }
 
+    /**
+     * @return int
+     */
+    public function getRole(): int {
+        return $this->role;
+    }
 
 }

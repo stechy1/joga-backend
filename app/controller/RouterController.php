@@ -58,7 +58,7 @@ class RouterController extends BaseController {
         }
 
         $this->logger->trace("Controller -> onStartup().");
-        $this->controller->onStartup();
+        $this->controller->onStartup($request);
 
         $action = $request->getAction();
         $this->logger->trace("Rozpoznal jsem akci kontroleru na: " . $action);

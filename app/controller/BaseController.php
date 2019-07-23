@@ -63,8 +63,10 @@ abstract class BaseController {
 
     /**
      * Provede se před hlavním zpracováním požadavku v kontroleru
+     *
+     * @param $request Požadavek, který přišel
      */
-    public function onStartup() {
+    public function onStartup(IRequest $request) {
     }
 
     /**

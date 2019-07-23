@@ -82,9 +82,12 @@ class Request implements IRequest {
         return !empty($this->files);
     }
 
+    function getHeaders() {
+        return getallheaders();
+    }
+
     public function __toString() {
         return sprintf("Controller: %s --> %s; Params: %s; Data: %s.", $this->controller, $this->action, json_encode($this->params), json_encode($this->data));
     }
-
 
 }

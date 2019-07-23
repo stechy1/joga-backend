@@ -4,6 +4,7 @@ namespace app\controller\admin;
 
 
 use app\controller\BaseApiController;
+use app\model\service\request\IRequest;
 
 /**
  * Class AdminBaseController
@@ -12,8 +13,11 @@ use app\controller\BaseApiController;
  */
 abstract class AdminBaseController extends BaseApiController {
 
-    public function onStartup() {
-        // TODO ověřit, zda-li je uživatel přihlášenej
+    public function onStartup(IRequest $request) {
+        $headers = $request->getHeaders();
+        if (!$headers['authorization']) {
+            echo var_dump($headers);
+        }
     }
 
 
