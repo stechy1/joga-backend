@@ -3,7 +3,6 @@
 namespace app\model\manager;
 
 use app\model\database\Database;
-use app\model\JWTModel;
 use app\model\service\exception\UserException;
 use app\model\User;
 use Logger;
@@ -36,10 +35,6 @@ class UserManager {
     public function __construct() {
         $this->logger = Logger::getLogger(__CLASS__);
     }
-
-//    private function createJSW(User $user) {
-//        //return Token::create($user->getId(), self::JSW_SECRET, time() + 3600, "localhost");
-//    }
 
     /**
      * Zaregistruje nového uživatele
@@ -86,4 +81,21 @@ class UserManager {
 
     }
 
+    /**
+     * Vrátí z databáze zadaný počet uživatelů
+     *
+     * @param int $from Index, od kterého uživatele mám začít vyhledávat
+     * @param int $count Počet uživatelů, které vrátím
+     * @return array|null Pole uživatelů
+     */
+    public function all(int $from, int $count) {
+        return $this->database->queryAll(
+            "SELECT users.id, users.email, users.role 
+                    FROM users
+                    WHERE users.id > ?
+                    ORDER BY users.id
+                    DESC LIMIT ?"
+            , [$from, $count]
+        );
+    }
 }
