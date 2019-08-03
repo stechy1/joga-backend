@@ -88,14 +88,27 @@ class UserManager {
      * @param int $count Počet uživatelů, které vrátím
      * @return array|null Pole uživatelů
      */
-    public function all(int $from, int $count) {
-        return $this->database->queryAll(
-            "SELECT users.id, users.email, users.role 
-                    FROM users
-                    WHERE users.id > ?
-                    ORDER BY users.id
-                    DESC LIMIT ?"
-            , [$from, $count]
-        );
+    public function all(int $count, int $from = -1) {
+        $this->logger->trace('From: ' . $from);
+        $this->logger->trace('Count: ' . $count);
+
+        $params = [];
+        $query = "SELECT users.id, users.email, users.role FROM users";
+        if ($from > -1) {
+            $query .= " WHERE users.id <= ?";
+            $params[] = $from;
+        }
+        $query .= " ORDER BY users.id DESC LIMIT ?";
+        $params[] = $count;
+        return $this->database->queryAll($query, $params);
+
+//        return $this->database->queryAll(
+//            "SELECT users.id, users.email, users.role
+//                    FROM users" .
+//                    $from == -1 ? "" : "WHERE users.id < ?" .
+//                    "ORDER BY users.id
+//                    DESC LIMIT ?"
+//            , [$from, $count]
+//        );
     }
 }
