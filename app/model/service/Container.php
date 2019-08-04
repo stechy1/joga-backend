@@ -50,7 +50,7 @@ class Container {
     public function registerFolder($folder) {
         if (empty($this->rootFolder)) $this->rootFolder = $folder;
 
-        $this->loadMap($folder);
+        $this->loadMap($folder, true);
     }
 
     private function loadMap($folder, $loadAnyway = false) {

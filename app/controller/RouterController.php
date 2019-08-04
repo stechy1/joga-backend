@@ -6,6 +6,7 @@ namespace app\controller;
 use app\model\service\Container;
 use app\model\service\request\IRequest;
 use Logger;
+use ReflectionException;
 
 /**
  * Class RouterController
@@ -39,11 +40,10 @@ class RouterController extends BaseController {
 
     }
 
-
-
     /**
      * Výchozí akce kontroleru
      * @param IRequest $request
+     * @throws ReflectionException
      */
     public function defaultAction(IRequest $request) {
         $controller = $request->getController() . 'controller';
@@ -86,6 +86,4 @@ class RouterController extends BaseController {
         $this->logger->trace(json_encode($this->data));
         $this->controller->sendResponce();
     }
-
-
 }

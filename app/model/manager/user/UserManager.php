@@ -1,6 +1,6 @@
 <?php
 
-namespace app\model\manager;
+namespace app\model\manager\user;
 
 use app\model\database\Database;
 use app\model\service\exception\UserException;

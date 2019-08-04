@@ -4,8 +4,8 @@
 namespace app\controller;
 
 
-use app\model\manager\UserManager;
-use app\model\service\exception\UserException;
+use app\model\manager\user\UserException;
+use app\model\manager\user\UserManager;
 use app\model\service\request\IRequest;
 use app\model\util\StatusCodes;
 use Logger;

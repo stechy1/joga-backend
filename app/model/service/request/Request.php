@@ -38,15 +38,15 @@ class Request implements IRequest {
         $this->logger->trace("Byl vytvořen nový request: " . $this->__toString());
     }
 
-    function getController() {
+    function getController(): string {
         return $this->controller;
     }
 
-    function getAction() {
+    function getAction(): string {
         return $this->action;
     }
 
-    function getDefaultAction() {
+    function getDefaultAction(): string {
         return 'default' . $this->requestMethod . 'Action';
     }
 
@@ -62,8 +62,8 @@ class Request implements IRequest {
         }
     }
 
-    function getFile($key) {
-        return isset($this->files[$key]) ? $this->files[$key] : null;
+    function getFile($key): FileEntry {
+        return isset($this->files[$key]) ? new FileEntry($this->files[$key]) : null;
     }
 
     function getFiles() {
@@ -87,7 +87,7 @@ class Request implements IRequest {
     }
 
     public function __toString() {
-        return sprintf("Controller: %s --> %s; Params: %s; Data: %s.", $this->controller, $this->action, json_encode($this->params), json_encode($this->data));
+        return sprintf("Controller: %s --> %s; Params: %s; Data: %s Files: %s.", $this->controller, $this->action, json_encode($this->params), json_encode($this->data), json_encode($this->files));
     }
 
 }

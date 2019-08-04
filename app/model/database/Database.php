@@ -114,10 +114,11 @@ class Database implements IDatabase {
      *
      * @param $table string Tabulka, s kterou se bude manipulovat
      * @param array $values Hodnoty, které se mají vložit
-     * @return int Počet ovlivněných řádek
+     * @return int ID vloženého záznamu
      */
     public function insert($table, $values = array()) {
-        return $this->query("INSERT INTO $table (" . implode(', ', array_keys($values)) . ") VALUES (" . str_repeat('?,', sizeOf($values) - 1) . "?)", array_values($values));
+        $this->query("INSERT INTO $table (" . implode(', ', array_keys($values)) . ") VALUES (" . str_repeat('?,', sizeOf($values) - 1) . "?)", array_values($values));
+        return $this->connection->lastInsertId();
     }
 
     /**

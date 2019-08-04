@@ -1,9 +1,10 @@
 <?php
 
-namespace app\model\manager;
+namespace app\model\manager\config;
 
 
-use app\model\service\exception\MyException;
+
+use app\model\service\exception\ConfigException;
 
 /**
  * Class ConfigManager - Správce nastavení webové aplikace
@@ -69,10 +70,10 @@ class ConfigManager {
      *
      * @param $key string Klíč
      * @param $value string Hodnota
-     * @throws MyException Pokud klíč neodpovídá zádnému klíči v poli
+     * @throws ConfigException Pokud klíč neodpovídá zádnému klíči v poli
      */
     public function updateConfig($key, $value) {
-        if (!array_key_exists($key, $this->config)) throw new MyException("Zadaný klíč nebyl nalezen");
+        if (!array_key_exists($key, $this->config)) throw new ConfigException("Zadaný klíč nebyl nalezen");
 
         $this->config[$key]['key'] = $value;
     }
@@ -80,23 +81,23 @@ class ConfigManager {
     /**
      * Uloží změny konfigurace
      *
-     * @throws MyException Pokud se nepodaří změna uložit na disk
+     * @throws ConfigException Pokud se nepodaří změna uložit na disk
      */
     public function saveConfig() {
         $success = file_put_contents($this->configPHPfile, $this->buildConfig());
-        if (!$success) throw new MyException("Konfiguraci se nepodařilo uložiz");
+        if (!$success) throw new ConfigException("Konfiguraci se nepodařilo uložiz");
     }
 
     /**
      * Nastaví aktuální konfiguraci jako výchozí
      *
      * @param $newConfig array Nová konfigurace
-     * @throws MyException Pokud se nepodaří změna uložit na disk
+     * @throws ConfigException Pokud se nepodaří změna uložit na disk
      */
     public function saveDefaultConfig($newConfig) {
         $tmpConfig = array();
         foreach ($newConfig as $key => $value) {
-            if (!array_key_exists($key, $this->config)) throw new MyException("Byl nalezen neznámý klíč");
+            if (!array_key_exists($key, $this->config)) throw new ConfigException("Byl nalezen neznámý klíč");
 
             $tmpConfig[$key] = array();
             $tmpConfig[$key]['name'] = $this->config[$key]['name'];
@@ -107,7 +108,7 @@ class ConfigManager {
         $this->config = $tmpConfig;
 
         $success = file_put_contents($this->configJSONfile, json_encode($this->config));
-        if (!$success) throw new MyException("Konfiguraci se nepodařilo uložit");
+        if (!$success) throw new ConfigException("Konfiguraci se nepodařilo uložit");
 
         $this->saveConfig();
     }

@@ -1,6 +1,6 @@
 <?php
 
-namespace app\model\service\exception;
+namespace app\model\manager\user;
 
 use Exception;
 

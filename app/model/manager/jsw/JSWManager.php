@@ -1,7 +1,7 @@
 <?php
 
 
-namespace app\model\manager;
+namespace app\model\manager\jsw;
 
 
 use app\model\User;

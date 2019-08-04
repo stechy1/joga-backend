@@ -7,7 +7,11 @@ use Logger;
 
 class ApiAdminDashboardController extends AdminBaseController {
 
+    /**
+     * @var Logger
+     */
     private $logger;
+
 
     public function __construct() {
         parent::__construct();

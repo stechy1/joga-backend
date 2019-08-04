@@ -13,7 +13,7 @@ interface IRequest {
      *
      * @return string Vrátí název kontrolleru
      */
-    function getController();
+    function getController(): string;
 
     /**
      * Získá název akce, která se má provést v kontroleru
@@ -24,9 +24,9 @@ interface IRequest {
      *         metoda = [HEAD, GET, POST, PUT, DELETE]
      *   UserGET, UserPOST, UserPUT, UserDELETE
      */
-    function getAction();
+    function getAction(): string;
 
-    function getDefaultAction();
+    function getDefaultAction(): string;
 
     /**
      * Vrátí hodnotu uloženou v postu na daném klíči. Pokud hodnota neexistuje, vrátí výchozí hodnotu
@@ -42,9 +42,9 @@ interface IRequest {
      *
      * @param $key string Klíč, pod kterým se má soubor nacházet
      *
-     * @return array|null
+     * @return FileEntry|null
      */
-    function getFile($key);
+    function getFile($key): FileEntry;
 
     /**
      * Vrátí pole nahraných souborů
