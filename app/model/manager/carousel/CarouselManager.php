@@ -54,10 +54,15 @@ class CarouselManager {
         return $this->database->queryAll($query, $params);
     }
 
+    public function one(int $id) {
+        return $this->database->queryOne("SELECT id, name, description, path, enabled, view_order FROM carousel WHERE id = ?", [$id]);
+    }
+
     /**
      * @param string $name Název obrázku
      * @param string $description Popis obrázku
      * @param FileEntry $image Instance reprezentující jeden obrázek
+     * @return array Pole s hodnotami obrázku z databáze
      * @throws ImageUploadException Pokud se nepodaří vygenerovat záznam v databázi
      * @throws FileManipulationException Pokud se nepodaří přesunout soubor na své místo
      */
@@ -129,5 +134,40 @@ class CarouselManager {
 
         $this->database->commit();
         return $result;
+    }
+
+    /**
+     * Smaže vybraný obrázek
+     *
+     * @param int $id ID obrázku, který se má smazat
+     * @throws ImageProcessException Pokud se nepodaří smazat záznam z neznámého důvodu
+     * @throws ImageNotFoundException Obrázek ke smazání nebyl nalezen
+     */
+    public function deleteImage(int $id) {
+        try {
+            $this->database->beginTransaction();
+            $imageRecord = $this->one($id);
+            if ($imageRecord == null) {
+                $this->logger->error("Obrázek ke smazání s ID: " . $id . " nebyl nalezen.");
+                throw new ImageNotFoundException("Obrázek nebyl nalezen");
+            }
+
+            $deletedRows = $this->database->delete(self::TABLE_NAME, 'WHERE id = ?', [$id]);
+            if ($deletedRows == 0) {
+                $this->logger->error("Obrázek ke smazání s ID: " . $id . " nebyl nalezen.");
+                throw new ImageNotFoundException("Obrázek nebyl nalezen");
+            }
+
+            $imageDir = $this->filemanager->getDirectory(FileManager::FOLDER_IMAGE);
+            $this->filemanager->deleteFile($imageDir . '/' . $imageRecord['path']);
+
+            $this->database->commit();
+        } catch (FileManipulationException $ex) {
+            $this->logger->error($ex->getMessage());
+            $this->database->rollback();
+        } catch (Exception $ex) {
+            $this->database->rollback();
+            throw new ImageProcessException($ex);
+        }
     }
 }

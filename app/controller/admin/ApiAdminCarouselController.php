@@ -5,6 +5,8 @@ namespace app\controller\admin;
 
 
 use app\model\manager\carousel\CarouselManager;
+use app\model\manager\carousel\ImageNotFoundException;
+use app\model\manager\carousel\ImageProcessException;
 use app\model\manager\carousel\ImageUploadException;
 use app\model\manager\file\FileManipulationException;
 use app\model\service\request\IRequest;
@@ -60,6 +62,18 @@ class ApiAdminCarouselController extends AdminBaseController {
         } catch (FileManipulationException $ex) {
             $this->addData(self::KEY_ERROR, $ex->getMessage());
             $this->setCode(StatusCodes::NOT_ACCEPTABLE);
+        }
+    }
+
+    public function defaultDELETEAction(IRequest $request) {
+        $id = $request->getParams()[0];
+        try {
+            $this->carouselmanager->deleteImage($id);
+            $this->setCode(StatusCodes::NO_CONTENT);
+        } catch (ImageNotFoundException $e) {
+            $this->setCode(StatusCodes::NOT_FOUND);
+        } catch (ImageProcessException $ex) {
+            $this->setCode(StatusCodes::METHOD_FAILURE);
         }
     }
 
