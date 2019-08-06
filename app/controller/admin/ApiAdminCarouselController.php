@@ -4,6 +4,7 @@
 namespace app\controller\admin;
 
 
+use app\model\manager\carousel\CarouselManager;
 use app\model\manager\carousel\ImageUploadException;
 use app\model\manager\file\FileManipulationException;
 use app\model\service\request\IRequest;
@@ -46,11 +47,12 @@ class ApiAdminCarouselController extends AdminBaseController {
 
     public function defaultPOSTAction(IRequest $request) {
         try {
-            $this->carouselmanager->addImage(
+            $image = $this->carouselmanager->addImage(
                 $request->get(self::KEY_POST_UPLOAD_NAME),
                 $request->get(self::KEY_POST_UPLOAD_DESCRIPTION, ''),
                 $request->getFile(self::KEY_POST_UPLOAD_IMAGE)
             );
+            $this->addData(self::KEY_POST_UPLOAD_IMAGE, $image);
             $this->setCode(StatusCodes::CREATED);
         } catch (ImageUploadException $ex) {
             $this->addData(self::KEY_ERROR, $ex->getMessage());

@@ -63,8 +63,14 @@ class CarouselManager {
      */
     public function addImage(string $name, string $description, FileEntry $image) {
         $this->database->beginTransaction();
+        $result = [];
         $destFileName = "";
         $insertedID = -1;
+
+        $result['name'] = $name;
+        $result['description'] = $description;
+        $result['enabled'] = 0;
+        $result['view_order'] = -1;
 
         // 1. Nakopíruj z tmp složky do public
         try {
@@ -84,6 +90,7 @@ class CarouselManager {
                 'description' => $description,
                 'path' => $fileHash,
             ]);
+            $result['id'] = $insertedID;
         } catch (Exception $ex) {
             $this->database->rollback();
             try {
@@ -109,6 +116,7 @@ class CarouselManager {
         $info = pathinfo($newFileName);
         try {
             $this->database->update(self::TABLE_NAME, ['path' => $info['basename']], "WHERE id = ?", [$insertedID]);
+            $result['path'] = $info['basename'];
         } catch (Exception $ex) {
             $this->logger->error($ex);
             try {
@@ -120,5 +128,6 @@ class CarouselManager {
         }
 
         $this->database->commit();
+        return $result;
     }
 }
