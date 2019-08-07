@@ -64,7 +64,7 @@ abstract class BaseController {
     /**
      * Provede se před hlavním zpracováním požadavku v kontroleru
      *
-     * @param $request Požadavek, který přišel
+     * @param IRequest $request Požadavek, který přišel
      */
     public function onStartup(IRequest $request) {
     }
@@ -85,6 +85,10 @@ abstract class BaseController {
 
     public function defaultPUTAction(IRequest $request) {
         $this->logger->info("defaultPUTAction");
+    }
+
+    public function defaultPATCHAction(IRequest $request) {
+        $this->logger->info("defaultPATCHAction");
     }
 
     public function defaultDELETEAction(IRequest $request) {

@@ -21,6 +21,13 @@ class CarouselManager {
 
     const TABLE_NAME = "carousel";
 
+    const COLUMN_IMAGE_ID = "id";
+    const COLUMN_IMAGE_NAME = "name";
+    const COLUMN_IMAGE_DESCRIPTION = "description";
+    const COLUMN_IMAGE = "image";
+    const COLUMN_ENABLED = "enabled";
+    const COLUMN_VIEW_ORDER = "view_order";
+
     /**
      * @var Logger
      */
@@ -54,6 +61,12 @@ class CarouselManager {
         return $this->database->queryAll($query, $params);
     }
 
+    /**
+     * Najde v databázi záznam o jednom obrázku a ten vrátí
+     *
+     * @param int $id ID obrázku
+     * @return array|null Pole reprezentující data o obrázku, nebo null
+     */
     public function one(int $id) {
         return $this->database->queryOne("SELECT id, name, description, path, enabled, view_order FROM carousel WHERE id = ?", [$id]);
     }
@@ -72,10 +85,10 @@ class CarouselManager {
         $destFileName = "";
         $insertedID = -1;
 
-        $result['name'] = $name;
-        $result['description'] = $description;
-        $result['enabled'] = 0;
-        $result['view_order'] = -1;
+        $result[self::COLUMN_IMAGE_NAME] = $name;
+        $result[self::COLUMN_IMAGE_DESCRIPTION] = $description;
+        $result[self::COLUMN_ENABLED] = 0;
+        $result[self::COLUMN_VIEW_ORDER] = -1;
 
         // 1. Nakopíruj z tmp složky do public
         try {
@@ -168,6 +181,31 @@ class CarouselManager {
         } catch (Exception $ex) {
             $this->database->rollback();
             throw new ImageProcessException($ex);
+        }
+    }
+
+    /**
+     * Aktualizuje základní údaje obrázku
+     * Pro aktualizaci samotného obrázku, je třeba volat jinou funkci
+     *
+     * @param string $imageId ID obrázku, který se bude aktualizovat
+     * @param string $name Nový název obrázku
+     * @param string $description Nový popis obrázku
+     * @param int $enabled 1 = aktivní, 0 = neaktivní
+     * @param int $viewOrder Pořadí, ve kterém se obrázek zobrazí, nebo -1
+     * @throws ImageProcessException Pokud se aktualizace údajů obrázku nezdaří
+     */
+    public function updateImage(string $imageId, string $name, string $description, int $enabled, int $viewOrder) {
+        $updatedRows = $this->database->update(
+            self::TABLE_NAME,
+            [self::COLUMN_IMAGE_NAME => $name, self::COLUMN_IMAGE_DESCRIPTION => $description, self::COLUMN_ENABLED => $enabled, self::COLUMN_VIEW_ORDER => $viewOrder],
+            "WHERE id = ?",
+            [$imageId]
+        );
+
+        if ($updatedRows == 0) {
+            $this->logger->error("Žádný obrázek nebyl aktualizován.");
+            throw new ImageProcessException("Žádný obrázek nebyl aktualizován.");
         }
     }
 }

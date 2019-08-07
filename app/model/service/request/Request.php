@@ -47,7 +47,8 @@ class Request implements IRequest {
     }
 
     function getDefaultAction(): string {
-        return 'default' . $this->requestMethod . 'Action';
+        $this->action = 'default' . $this->requestMethod . 'Action';
+        return $this->action;
     }
 
     function get($key = null, $default = null) {

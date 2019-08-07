@@ -6,7 +6,7 @@ namespace app\model\service\request;
 interface IRequest {
 
     const
-        HEAD = 'HEAD', GET = 'GET', POST = 'POST', PUT = 'PUT', DELETE = 'DELETE';
+        HEAD = 'HEAD', GET = 'GET', POST = 'POST', PUT = 'PUT', PATCH = 'PATCH', DELETE = 'DELETE';
 
     /**
      * Získá název kontroleru

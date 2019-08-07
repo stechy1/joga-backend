@@ -20,12 +20,7 @@ use Logger;
  */
 class ApiAdminCarouselController extends AdminBaseController {
 
-    const KEY_GET_ALL_IMAGES = "images";
-
-    const KEY_POST_UPLOAD_NAME = "name";
-    const KEY_POST_UPLOAD_DESCRIPTION = "description";
-    const KEY_POST_UPLOAD_IMAGE = "image";
-
+    const KEY_IMAGES = "images";
     const KEY_ERROR = "error";
 
     /**
@@ -44,17 +39,17 @@ class ApiAdminCarouselController extends AdminBaseController {
 
     public function defaultGETAction(IRequest $request) {
         $images = $this->carouselmanager->all();
-        $this->addData(self::KEY_GET_ALL_IMAGES, $images);
+        $this->addData(self::KEY_IMAGES, $images);
     }
 
     public function defaultPOSTAction(IRequest $request) {
         try {
             $image = $this->carouselmanager->addImage(
-                $request->get(self::KEY_POST_UPLOAD_NAME),
-                $request->get(self::KEY_POST_UPLOAD_DESCRIPTION, ''),
-                $request->getFile(self::KEY_POST_UPLOAD_IMAGE)
+                $request->get(CarouselManager::COLUMN_IMAGE_NAME),
+                $request->get(CarouselManager::COLUMN_IMAGE_DESCRIPTION, ''),
+                $request->getFile(CarouselManager::COLUMN_IMAGE)
             );
-            $this->addData(self::KEY_POST_UPLOAD_IMAGE, $image);
+            $this->addData(CarouselManager::COLUMN_IMAGE, $image);
             $this->setCode(StatusCodes::CREATED);
         } catch (ImageUploadException $ex) {
             $this->addData(self::KEY_ERROR, $ex->getMessage());
@@ -62,6 +57,21 @@ class ApiAdminCarouselController extends AdminBaseController {
         } catch (FileManipulationException $ex) {
             $this->addData(self::KEY_ERROR, $ex->getMessage());
             $this->setCode(StatusCodes::NOT_ACCEPTABLE);
+        }
+    }
+
+    public function updatePOSTAction(IRequest $request) {
+        try {
+            $this->carouselmanager->updateImage(
+                $request->get(CarouselManager::COLUMN_IMAGE_ID),
+                $request->get(CarouselManager::COLUMN_IMAGE_NAME),
+                $request->get(CarouselManager::COLUMN_IMAGE_DESCRIPTION),
+                +$request->get(CarouselManager::COLUMN_ENABLED),
+                +$request->get(CarouselManager::COLUMN_VIEW_ORDER)
+            );
+        } catch (ImageProcessException $ex) {
+            $this->addData(self::KEY_ERROR, $ex->getMessage());
+            $this->setCode(StatusCodes::NOT_FOUND);
         }
     }
 
