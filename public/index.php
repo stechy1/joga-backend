@@ -6,15 +6,19 @@ use app\model\service\Container;
 
 //session_start();
 
-define("__HOME__", $_SERVER['REQUEST_SCHEME'] . "://" . $_SERVER['HTTP_HOST']);
-define("__IS_WINDOWS__", strpos($_SERVER['DOCUMENT_ROOT'], "/") !== false);
-date_default_timezone_set('Europe/Prague');
-$loader = require "vendor/autoload.php";
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 
-Logger::configure("app/config/log4php.xml");
+define("__HOME__", $_SERVER['REQUEST_SCHEME'] . "://" . $_SERVER['HTTP_HOST']);
+define("__IS_WINDOWS__", strpos($_SERVER['DOCUMENT_ROOT'], "\\") !== false);
+date_default_timezone_set('Europe/Prague');
+$loader = require "../vendor/autoload.php";
+
+Logger::configure("../app/config/log4php.xml");
 
 /** @var Container $container */
-$container = require("app/bootstrap.php");
+$container = require("../app/bootstrap.php");
 /** @var App $app */
 $app = $container->getInstanceOf('app');
 $app->run();

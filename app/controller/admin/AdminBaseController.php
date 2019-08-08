@@ -15,11 +15,9 @@ abstract class AdminBaseController extends BaseApiController {
 
     public function onStartup(IRequest $request) {
         $headers = $request->getHeaders();
-        if (!$headers['authorization']) {
+        if (!$headers['authorization'] && !$headers['Authorization']) {
             echo var_dump($headers);
         }
     }
-
-
 
 }

@@ -54,7 +54,7 @@ class Container {
     }
 
     private function loadMap($folder, $loadAnyway = false) {
-        $cacheFile = "app/cache/map.php";
+        $cacheFile = "../app/cache/map.php";
         $this->clasess = array();
         if (file_exists($cacheFile) && !$loadAnyway) {
             /** @noinspection PhpIncludeInspection */

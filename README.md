@@ -67,3 +67,18 @@ define('JWT_ISSUER', 'vypln');
   Kdykoliv založíš novou třídu, je bohužel nutné zavolat v příkazovém řádku: 
   `composer update` pro aktualizování cache autoloaderu.
   
+## REST-API
+
+API disponuje standartními metodami:
+GET, POST, PUT, UPDATE, DELETE 
+
+### Odpovědi
+Pro každou metodu se může lišit výsledek volání:
+
+| Metoda/úspěšnost | úspech | neúspěch |
+|:----------------:|:------:|:--------:|
+|        GET       |   200  |    404   |
+|       POST       |   204  |    400   |
+|        PUT       |   201  |    400   |
+|      UPDATE      |   204  |    404   |
+|      DELETE      |   204  |    404   |
