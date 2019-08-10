@@ -12,7 +12,7 @@ use Logger;
  */
 class FileManager {
 
-    const FOLDER_UPLOADS = "uploads", FOLDER_IMAGE = "image", FOLDER_TMP = "tmp";
+    const FOLDER_UPLOADS = "uploads", FOLDER_IMAGE = "image", FOLDER_TMP = "tmp", FOLDER_INFO = "info";
 
     private $logger;
 
@@ -32,9 +32,9 @@ class FileManager {
 
         $this->folders[self::FOLDER_UPLOADS] = $this->folderRoot . "public/uploads/";
 //        $this->folders[self::FOLDER_CATEGORY] = $this->folders['uploads'] . "category/";
-        $this->folders[self::FOLDER_IMAGE] = $this->folders['uploads'] . "image/";
-        $this->folders[self::FOLDER_TMP] = $this->folders['uploads'] . "tmp/";
-//        $this->folders[self::FOLDER_AVATAR] = $this->folders['image'] . "avatar/";
+        $this->folders[self::FOLDER_IMAGE] = $this->folders[self::FOLDER_UPLOADS] . "image/";
+        $this->folders[self::FOLDER_TMP] = $this->folders[self::FOLDER_UPLOADS] . "tmp/";
+        $this->folders[self::FOLDER_INFO] = $this->folders[self::FOLDER_UPLOADS] . "info/";
 //        $this->folders[self::FOLDER_FORUM_IMAGE] = $this->folders['image'] . "/forum";
 
         foreach ($this->folders as $folder) $this->createDirectory($folder);
@@ -52,6 +52,10 @@ class FileManager {
 //
 //        return $path;
 //    }
+
+    public static function mergePath($path, ...$paths) {
+        return $path . join("/", $paths);
+    }
 
     /**
      * Metoda rekurzivně projede zadanou cestu a smaže všechno, co jí příjde do cesty
@@ -182,11 +186,21 @@ class FileManager {
      *
      * @param $path string Cesta k souboru
      * @param $text string Obsah souboru
+     * @throws FileManipulationException Pokud se zápis do souboru nezdaří
      */
     public function writeFile($path, $text) {
-        $file = fopen($path, "w");
-        fwrite($file, $text);
-        fclose($file);
+        $this->logger->trace("Zapisuji obsah do souboru: " . $path);
+        if (!file_exists($path)) {
+            if (!touch($path)) {
+                throw new FileManipulationException("Soubor se nepodařilo vytvořit!");
+            }
+        }
+        if (!file_put_contents($path, $text)) {
+            throw new FileManipulationException("Obsah se nepodařilo zapsat do souboru!");
+        }
+//        $file = fopen($path, "w");
+//        fwrite($file, $text);
+//        fclose($file);
     }
 
     /**
