@@ -87,6 +87,10 @@ class Request implements IRequest {
         return getallheaders();
     }
 
+    function spliceParams() {
+        $this->params = array_slice($this->params, 1);
+    }
+
     public function __toString() {
         return sprintf("Controller: %s --> %s; Params: %s; Data: %s Files: %s.", $this->controller, $this->action, json_encode($this->params), json_encode($this->data), json_encode($this->files));
     }

@@ -81,4 +81,6 @@ interface IRequest {
      * @return string[] Pole se všemi hlavičkami, které přišly spolu s požadavkem
      */
     function getHeaders();
+
+    function spliceParams();
 }

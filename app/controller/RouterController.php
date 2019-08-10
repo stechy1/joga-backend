@@ -66,6 +66,10 @@ class RouterController extends BaseController {
         if (!method_exists($this->controller, $action)) {
             $this->logger->trace("Akce nebyla nalezena, používám výchozí.");
             $action = $request->getDefaultAction();
+        } else {
+            if (count($request->getParams()) > 1) {
+                $request->spliceParams();
+            }
         }
 
         try {
