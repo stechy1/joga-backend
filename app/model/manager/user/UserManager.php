@@ -3,7 +3,7 @@
 namespace app\model\manager\user;
 
 use app\model\database\Database;
-use app\model\service\exception\UserException;
+use app\model\manager\jsw\JSWManager;
 use app\model\User;
 use Logger;
 use PDOException;
@@ -110,5 +110,9 @@ class UserManager {
 //                    DESC LIMIT ?"
 //            , [$from, $count]
 //        );
+    }
+
+    public function trainers() {
+        return $this->database->queryAll("SELECT id, name FROM users WHERE role > 1");
     }
 }

@@ -74,6 +74,7 @@ class Database implements IDatabase {
      */
     public function queryAll($query, $parameters = array()) {
         $this->logger->trace($query);
+        $this->logger->trace($parameters);
         $result = $this->connection->prepare($query);
         $result->execute($parameters);
         return $result->fetchAll(PDO::FETCH_ASSOC);
