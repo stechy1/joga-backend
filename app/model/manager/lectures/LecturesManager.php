@@ -64,9 +64,9 @@ class LecturesManager {
                              LEFT JOIN users trainers ON trainers.id = lectures.id
                              LEFT JOIN lecture_type ON lecture_type.id = lectures.type
                              LEFT JOIN lecture_reservations clients ON clients.lecture = lectures.id
-                    WHERE start_time BETWEEN ? AND ?",
+                    WHERE start_time BETWEEN ? AND ?
+                    GROUP BY lectures.id, start_time, duration, max_persons, place, published, trainers.id, trainers.name, lecture_type.name",
             [$firstDay->getTimestamp(), $lastDay->getTimestamp()]);
-
     }
 
     public function insert(int $trainer, int $startTime, int $duration, int $maxPersons, string $place) {
