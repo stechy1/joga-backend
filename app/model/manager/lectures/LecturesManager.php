@@ -40,7 +40,6 @@ class LecturesManager {
     }
 
     public function all(int $monthTimestamp) {
-        $monthTimestamp /= 1000;
         $this->logger->trace($monthTimestamp);
 
         $firstDay = new DateTime();
@@ -56,10 +55,15 @@ class LecturesManager {
         $this->logger->trace($lastDay);
 
         return $this->database->queryAll(
-            "SELECT lectures.id as lecture_id, start_time, duration, max_persons, place, published,
-                           users.id AS user_id, users.name
+            "
+                    SELECT lectures.id AS lecture_id, start_time, duration, max_persons, place, published,
+                           trainers.id AS trainer_id, trainers.name AS trainer_name,
+                           lecture_type.name AS lecture_name,
+                           COUNT(clients.client) AS reserved_clients
                     FROM lectures
-                    LEFT JOIN users ON users.id = lectures.id
+                             LEFT JOIN users trainers ON trainers.id = lectures.id
+                             LEFT JOIN lecture_type ON lecture_type.id = lectures.type
+                             LEFT JOIN lecture_reservations clients ON clients.lecture = lectures.id
                     WHERE start_time BETWEEN ? AND ?",
             [$firstDay->getTimestamp(), $lastDay->getTimestamp()]);
 
@@ -68,7 +72,7 @@ class LecturesManager {
     public function insert(int $trainer, int $startTime, int $duration, int $maxPersons, string $place) {
         $this->database->insert(self::TABLE_NAME, [
             LecturesManager::COLUMN_TRAINER => $trainer,
-            LecturesManager::COLUMN_START_TIME => $startTime / 1000,
+            LecturesManager::COLUMN_START_TIME => $startTime,
             LecturesManager::COLUMN_DURATION => $duration,
             LecturesManager::COLUMN_MAX_PERSONS => $maxPersons,
             LecturesManager::COLUMN_PLACE => $place
