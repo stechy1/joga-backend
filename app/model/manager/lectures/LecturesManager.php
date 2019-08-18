@@ -61,7 +61,7 @@ class LecturesManager {
                            lecture_type.name AS lecture_name,
                            COUNT(clients.client) AS reserved_clients
                     FROM lectures
-                             LEFT JOIN users trainers ON trainers.id = lectures.id
+                             LEFT JOIN users trainers ON trainers.id = lectures.trainer
                              LEFT JOIN lecture_type ON lecture_type.id = lectures.type
                              LEFT JOIN lecture_reservations clients ON clients.lecture = lectures.id
                     WHERE start_time BETWEEN ? AND ?
