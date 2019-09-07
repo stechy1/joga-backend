@@ -21,6 +21,8 @@ use Logger;
 class ApiAdminLecturesController extends AdminBaseController {
 
     const TRAINERS = "trainers";
+    const LECTURE_TYPES = "lectureTypes";
+    const LECTURE = "lecture";
 
     /**
      * @var Logger
@@ -56,14 +58,43 @@ class ApiAdminLecturesController extends AdminBaseController {
         }
     }
 
+    public function lecture_TypesGETAction(IRequest $request) {
+        try {
+            $types = $this->lecturesmanager->lectureTypes();
+            $this->addData(self::LECTURE_TYPES, $types);
+        } catch (Exception $ex) {
+            $this->logger->error("Nepodařilo se uskutečnit dotaz pro získání typů lekcí!", $ex);
+            $this->setCode(StatusCodes::METHOD_FAILURE);
+        }
+    }
+
     public function defaultPOSTAction(IRequest $request) {
         $trainer = +$request->get(LecturesManager::COLUMN_TRAINER);
         $startTime = +$request->get(LecturesManager::COLUMN_START_TIME);
         $duration = +$request->get(LecturesManager::COLUMN_DURATION);
         $maxPersons = +$request->get(LecturesManager::COLUMN_MAX_PERSONS);
         $place = $request->get(LecturesManager::COLUMN_PLACE);
+        $lectureType = +$request->get(LecturesManager::COLUMN_TYPE);
 
-        $this->lecturesmanager->insert($trainer, $startTime, $duration, $maxPersons, $place);
+        try {
+            $lectureId = $this->lecturesmanager->insert($trainer, $startTime, $duration, $maxPersons, $place);
+            $lectureName = $this->lecturesmanager->lectureNameByType($lectureType);
+
+            $lecture = [];
+            $lecture[LecturesManager::COLUMN_ID] = $lectureId;
+            $lecture[LecturesManager::COLUMN_TRAINER] = $trainer;
+            $lecture[LecturesManager::COLUMN_START_TIME] = $startTime;
+            $lecture[LecturesManager::COLUMN_DURATION] = $duration;
+            $lecture[LecturesManager::COLUMN_MAX_PERSONS] = $maxPersons;
+            $lecture[LecturesManager::COLUMN_PLACE] = $place;
+            $lecture[LecturesManager::VIRTUAL_COLUMN_LECTURE_NAME] = $lectureName['name'];
+            $lecture[LecturesManager::VIRTUAL_COLUMN_RESERVED_CLIENTS] = 0;
+
+            $this->addData(self::LECTURE, $lecture);
+        } catch (Exception $ex) {
+            $this->logger->error("Nepodařilo se založit novou lekci!", $ex);
+            $this->setCode(StatusCodes::METHOD_FAILURE);
+        }
     }
 
 }

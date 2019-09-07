@@ -26,6 +26,9 @@ class LecturesManager {
     const COLUMN_PLACE = "place";
     const COLUMN_PUBLISHED = "published";
 
+    const VIRTUAL_COLUMN_LECTURE_NAME = "lecture_name";
+    const VIRTUAL_COLUMN_RESERVED_CLIENTS = "reserved_clients";
+
     /**
      * @var Logger
      */
@@ -70,12 +73,20 @@ class LecturesManager {
     }
 
     public function insert(int $trainer, int $startTime, int $duration, int $maxPersons, string $place) {
-        $this->database->insert(self::TABLE_NAME, [
+        return $this->database->insert(self::TABLE_NAME, [
             LecturesManager::COLUMN_TRAINER => $trainer,
             LecturesManager::COLUMN_START_TIME => $startTime,
             LecturesManager::COLUMN_DURATION => $duration,
             LecturesManager::COLUMN_MAX_PERSONS => $maxPersons,
             LecturesManager::COLUMN_PLACE => $place
         ]);
+    }
+
+    public function lectureNameByType(int $lectureType) {
+        return $this->database->queryOne("SELECT name FROM lecture_type WHERE id = ?", [$lectureType]);
+    }
+
+    public function lectureTypes() {
+        return $this->database->queryAll("SELECT id, name FROM lecture_type");
     }
 }
