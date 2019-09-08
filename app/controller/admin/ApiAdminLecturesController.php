@@ -68,6 +68,18 @@ class ApiAdminLecturesController extends AdminBaseController {
         }
     }
 
+    public function idGETAction(IRequest $request) {
+        $lectureId = +$request->getParams()[0];
+
+        try {
+            $lecture = $this->lecturesmanager->byId($lectureId);
+            $this->addData(self::LECTURE, $lecture);
+        } catch (Exception $ex) {
+            $this->logger->error("Nepodařilo se uskutečnit dotaz pro získání informací o lekci s ID: " . $lectureId . "!", $ex);
+            $this->setCode(StatusCodes::METHOD_FAILURE);
+        }
+    }
+
     public function defaultPOSTAction(IRequest $request) {
         $trainer = +$request->get(LecturesManager::COLUMN_TRAINER);
         $startTime = +$request->get(LecturesManager::COLUMN_START_TIME);
@@ -77,18 +89,8 @@ class ApiAdminLecturesController extends AdminBaseController {
         $lectureType = +$request->get(LecturesManager::COLUMN_TYPE);
 
         try {
-            $lectureId = $this->lecturesmanager->insert($trainer, $startTime, $duration, $maxPersons, $place);
-            $lectureName = $this->lecturesmanager->lectureNameByType($lectureType);
-
-            $lecture = [];
-            $lecture[LecturesManager::COLUMN_ID] = $lectureId;
-            $lecture[LecturesManager::COLUMN_TRAINER] = $trainer;
-            $lecture[LecturesManager::COLUMN_START_TIME] = $startTime;
-            $lecture[LecturesManager::COLUMN_DURATION] = $duration;
-            $lecture[LecturesManager::COLUMN_MAX_PERSONS] = $maxPersons;
-            $lecture[LecturesManager::COLUMN_PLACE] = $place;
-            $lecture[LecturesManager::VIRTUAL_COLUMN_LECTURE_NAME] = $lectureName['name'];
-            $lecture[LecturesManager::VIRTUAL_COLUMN_RESERVED_CLIENTS] = 0;
+            $lectureId = $this->lecturesmanager->insert($trainer, $startTime, $duration, $maxPersons, $place, $lectureType);
+            $lecture = $this->lecturesmanager->byId($lectureId);
 
             $this->addData(self::LECTURE, $lecture);
         } catch (Exception $ex) {
@@ -96,5 +98,26 @@ class ApiAdminLecturesController extends AdminBaseController {
             $this->setCode(StatusCodes::METHOD_FAILURE);
         }
     }
+
+    public function updatePOSTAction(IRequest $request) {
+        $lectureId = +$request->get(LecturesManager::COLUMN_ID);
+        $trainer = +$request->get(LecturesManager::COLUMN_TRAINER);
+        $startTime = +$request->get(LecturesManager::COLUMN_START_TIME);
+        $duration = +$request->get(LecturesManager::COLUMN_DURATION);
+        $maxPersons = +$request->get(LecturesManager::COLUMN_MAX_PERSONS);
+        $place = $request->get(LecturesManager::COLUMN_PLACE);
+        $lectureType = +$request->get(LecturesManager::COLUMN_TYPE);
+
+        try {
+            $this->lecturesmanager->update($lectureId, $trainer, $startTime, $duration, $maxPersons, $place, $lectureType);
+            $lecture = $this->lecturesmanager->byId($lectureId);
+
+            $this->addData(self::LECTURE, $lecture);
+        } catch (Exception $ex) {
+            $this->logger->error("Nepodařilo se upravit lekci s ID: " . $lectureId . "!", $ex);
+            $this->setCode(StatusCodes::METHOD_FAILURE);
+        }
+    }
+
 
 }

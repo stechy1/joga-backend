@@ -58,8 +58,7 @@ class LecturesManager {
         $this->logger->trace($lastDay);
 
         return $this->database->queryAll(
-            "
-                    SELECT lectures.id AS lecture_id, start_time, duration, max_persons, place, published,
+            "SELECT lectures.id AS lecture_id, start_time, duration, max_persons, place, published, type,
                            trainers.id AS trainer_id, trainers.name AS trainer_name,
                            lecture_type.name AS lecture_name,
                            COUNT(clients.client) AS reserved_clients
@@ -72,13 +71,14 @@ class LecturesManager {
             [$firstDay->getTimestamp(), $lastDay->getTimestamp()]);
     }
 
-    public function insert(int $trainer, int $startTime, int $duration, int $maxPersons, string $place) {
+    public function insert(int $trainer, int $startTime, int $duration, int $maxPersons, string $place, int $type) {
         return $this->database->insert(self::TABLE_NAME, [
             LecturesManager::COLUMN_TRAINER => $trainer,
             LecturesManager::COLUMN_START_TIME => $startTime,
             LecturesManager::COLUMN_DURATION => $duration,
             LecturesManager::COLUMN_MAX_PERSONS => $maxPersons,
-            LecturesManager::COLUMN_PLACE => $place
+            LecturesManager::COLUMN_PLACE => $place,
+            LecturesManager::COLUMN_TYPE => $type
         ]);
     }
 
@@ -88,5 +88,32 @@ class LecturesManager {
 
     public function lectureTypes() {
         return $this->database->queryAll("SELECT id, name FROM lecture_type");
+    }
+
+    public function byId(int $lectureId) {
+        return $this->database->queryOne(
+            "SELECT lectures.id AS lecture_id, start_time, duration, max_persons, place, published, type,
+                           trainers.id AS trainer_id, trainers.name AS trainer_name,
+                           lecture_type.name AS lecture_name,
+                           COUNT(clients.client) AS reserved_clients
+                    FROM lectures
+                             LEFT JOIN users trainers ON trainers.id = lectures.trainer
+                             LEFT JOIN lecture_type ON lecture_type.id = lectures.type
+                             LEFT JOIN lecture_reservations clients ON clients.lecture = lectures.id
+                    WHERE lectures.id = ?",
+            [$lectureId]);
+    }
+
+    public function update(int $lectureId, int $trainer, int $startTime, int $duration, int $maxPersons, $place, int $lectureType) {
+        return $this->database->update(self::TABLE_NAME,
+            [
+                LecturesManager::COLUMN_TRAINER => $trainer,
+                LecturesManager::COLUMN_START_TIME => $startTime,
+                LecturesManager::COLUMN_DURATION => $duration,
+                LecturesManager::COLUMN_MAX_PERSONS => $maxPersons,
+                LecturesManager::COLUMN_PLACE => $place,
+                LecturesManager::COLUMN_TYPE => $lectureType
+            ], " WHERE id = ?",
+            [$lectureId]);
     }
 }
