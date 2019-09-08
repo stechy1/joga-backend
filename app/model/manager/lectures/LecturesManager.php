@@ -120,4 +120,14 @@ class LecturesManager {
     public function delete(int $lectureId) {
         return $this->database->delete(self::TABLE_NAME, "WHERE id = ?", [$lectureId]);
     }
+
+    public function checkDateTimeValidity(int $timestamp) {
+        $dateTime = new DateTime();
+        $dateTime->setTimestamp($timestamp);
+
+
+
+        $this->logger->trace($dateTime);
+        return false;
+    }
 }

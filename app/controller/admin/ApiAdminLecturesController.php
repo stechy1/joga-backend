@@ -23,6 +23,7 @@ class ApiAdminLecturesController extends AdminBaseController {
     const TRAINERS = "trainers";
     const LECTURE_TYPES = "lectureTypes";
     const LECTURE = "lecture";
+    const VALID = "valid";
 
     /**
      * @var Logger
@@ -77,6 +78,19 @@ class ApiAdminLecturesController extends AdminBaseController {
         } catch (Exception $ex) {
             $this->logger->error("Nepodařilo se uskutečnit dotaz pro získání informací o lekci s ID: " . $lectureId . "!", $ex);
             $this->setCode(StatusCodes::METHOD_FAILURE);
+        }
+    }
+
+    public function date_time_validityGETAction(IRequest $request) {
+        $dateTime = +$request->getParams()[0];
+
+        try {
+            $valid = $this->lecturesmanager->checkDateTimeValidity($dateTime);
+            $this->addData(self::VALID, $valid);
+        } catch (Exception $ex) {
+            $this->logger->error("Nepodařilo se zvalidovat datum", $ex);
+            $this->setCode(StatusCodes::METHOD_FAILURE);
+            $this->addData(self::VALID, false);
         }
     }
 
