@@ -60,6 +60,7 @@ class Database implements IDatabase {
      */
     public function queryOne($query, $parameters = array()) {
         $this->logger->trace($query);
+        $this->logger->trace($parameters);
         $result = $this->connection->prepare($query);
         $result->execute($parameters);
         return $result->fetch(PDO::FETCH_ASSOC);
@@ -105,6 +106,7 @@ class Database implements IDatabase {
      */
     public function query($query, $parameters = array()) {
         $this->logger->trace($query);
+        $this->logger->trace($parameters);
         $result = $this->connection->prepare($query);
         $result->execute($parameters);
         return $result->rowCount();
