@@ -116,4 +116,8 @@ class LecturesManager {
             ], " WHERE id = ?",
             [$lectureId]);
     }
+
+    public function delete(int $lectureId) {
+        return $this->database->delete(self::TABLE_NAME, "WHERE id = ?", [$lectureId]);
+    }
 }

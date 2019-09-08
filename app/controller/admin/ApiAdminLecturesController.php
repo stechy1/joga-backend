@@ -119,5 +119,18 @@ class ApiAdminLecturesController extends AdminBaseController {
         }
     }
 
+    public function defaultDELETEAction(IRequest $request) {
+        $lectureId = +$request->getParams()[0];
+
+        try {
+            $lecture = $this->lecturesmanager->byId($lectureId);
+            $this->lecturesmanager->delete($lectureId);
+            $this->addData(self::LECTURE, $lecture);
+        } catch (Exception $ex) {
+            $this->logger->error("Nepodařilo se smazat lekci s ID: " . $lectureId . "!", $ex);
+            $this->setCode(StatusCodes::METHOD_FAILURE);
+        }
+    }
+
 
 }
