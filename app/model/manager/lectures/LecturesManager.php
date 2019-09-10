@@ -5,7 +5,9 @@ namespace app\model\manager\lectures;
 
 
 use app\model\database\Database;
+use DateInterval;
 use DateTime;
+use Exception;
 use Logger;
 
 /**
@@ -20,8 +22,8 @@ class LecturesManager {
     const COLUMN_ID = "id";
     const COLUMN_TRAINER = "trainer";
     const COLUMN_TYPE = "type";
-    const COLUMN_START_TIME = "start_time";
-    const COLUMN_DURATION = "duration";
+    const COLUMN_TIME_START = "time_start";
+    const COLUMN_TIME_END = "time_end";
     const COLUMN_MAX_PERSONS = "max_persons";
     const COLUMN_PLACE = "place";
     const COLUMN_PUBLISHED = "published";
@@ -58,7 +60,7 @@ class LecturesManager {
         $this->logger->trace($lastDay);
 
         return $this->database->queryAll(
-            "SELECT lectures.id AS lecture_id, start_time, duration, max_persons, place, published, type,
+            "SELECT lectures.id AS lecture_id, time_start, time_end, max_persons, place, published, type,
                            trainers.id AS trainer_id, trainers.name AS trainer_name,
                            lecture_type.name AS lecture_name,
                            COUNT(clients.client) AS reserved_clients
@@ -66,16 +68,16 @@ class LecturesManager {
                              LEFT JOIN users trainers ON trainers.id = lectures.trainer
                              LEFT JOIN lecture_type ON lecture_type.id = lectures.type
                              LEFT JOIN lecture_reservations clients ON clients.lecture = lectures.id
-                    WHERE start_time BETWEEN ? AND ?
-                    GROUP BY lectures.id, start_time, duration, max_persons, place, published, trainers.id, trainers.name, lecture_type.name",
+                    WHERE time_start BETWEEN ? AND ?
+                    GROUP BY lectures.id, time_start, time_end, max_persons, place, published, trainers.id, trainers.name, lecture_type.name",
             [$firstDay->getTimestamp(), $lastDay->getTimestamp()]);
     }
 
-    public function insert(int $trainer, int $startTime, int $duration, int $maxPersons, string $place, int $type) {
+    public function insert(int $trainer, int $timeStart, int $timeEnd, int $maxPersons, string $place, int $type) {
         return $this->database->insert(self::TABLE_NAME, [
             LecturesManager::COLUMN_TRAINER => $trainer,
-            LecturesManager::COLUMN_START_TIME => $startTime,
-            LecturesManager::COLUMN_DURATION => $duration,
+            LecturesManager::COLUMN_TIME_START => $timeStart,
+            LecturesManager::COLUMN_TIME_END => $timeEnd,
             LecturesManager::COLUMN_MAX_PERSONS => $maxPersons,
             LecturesManager::COLUMN_PLACE => $place,
             LecturesManager::COLUMN_TYPE => $type
@@ -92,7 +94,7 @@ class LecturesManager {
 
     public function byId(int $lectureId) {
         return $this->database->queryOne(
-            "SELECT lectures.id AS lecture_id, start_time, duration, max_persons, place, published, type,
+            "SELECT lectures.id AS lecture_id, time_start, time_end, max_persons, place, published, type,
                            trainers.id AS trainer_id, trainers.name AS trainer_name,
                            lecture_type.name AS lecture_name,
                            COUNT(clients.client) AS reserved_clients
@@ -100,16 +102,17 @@ class LecturesManager {
                              LEFT JOIN users trainers ON trainers.id = lectures.trainer
                              LEFT JOIN lecture_type ON lecture_type.id = lectures.type
                              LEFT JOIN lecture_reservations clients ON clients.lecture = lectures.id
-                    WHERE lectures.id = ?",
+                    WHERE lectures.id = ?
+                    GROUP BY lectures.id, time_start, time_end, max_persons, place, published, type, trainers.id, trainers.name, lecture_type.name",
             [$lectureId]);
     }
 
-    public function update(int $lectureId, int $trainer, int $startTime, int $duration, int $maxPersons, $place, int $lectureType) {
+    public function update(int $lectureId, int $trainer, int $timeStart, int $timeEnd, int $maxPersons, $place, int $lectureType) {
         return $this->database->update(self::TABLE_NAME,
             [
                 LecturesManager::COLUMN_TRAINER => $trainer,
-                LecturesManager::COLUMN_START_TIME => $startTime,
-                LecturesManager::COLUMN_DURATION => $duration,
+                LecturesManager::COLUMN_TIME_START => $timeStart,
+                LecturesManager::COLUMN_TIME_END => $timeEnd,
                 LecturesManager::COLUMN_MAX_PERSONS => $maxPersons,
                 LecturesManager::COLUMN_PLACE => $place,
                 LecturesManager::COLUMN_TYPE => $lectureType
@@ -118,6 +121,7 @@ class LecturesManager {
     }
 
     public function delete(int $lectureId) {
+        $this->logger->info("Mažu lekci s id: " . $lectureId);
         return $this->database->delete(self::TABLE_NAME, "WHERE id = ?", [$lectureId]);
     }
 
@@ -125,9 +129,27 @@ class LecturesManager {
         $dateTime = new DateTime();
         $dateTime->setTimestamp($timestamp);
 
-
+        $this->logger->info($timestamp);
 
         $this->logger->trace($dateTime);
         return false;
+    }
+
+    /**
+     *
+     *
+     * @param int $timestamp
+     * @param int $duration
+     * @throws Exception
+     */
+    public function checkDurationValidity(int $timestamp, int $duration) {
+        $dateTimeFrom = new DateTime();
+        $dateTimeFrom->setTimestamp($timestamp);
+
+        $dateTimeTo = new DateTime();
+        $dateTimeTo->setTimestamp($timestamp);
+        $dateTimeTo->add(new DateInterval('PT' . $duration . 'M'));
+
+
     }
 }

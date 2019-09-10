@@ -82,32 +82,48 @@ class ApiAdminLecturesController extends AdminBaseController {
     }
 
     public function date_time_validityGETAction(IRequest $request) {
+        $valid = false;
         $dateTime = +$request->getParams()[0];
 
         try {
             $valid = $this->lecturesmanager->checkDateTimeValidity($dateTime);
-            $this->addData(self::VALID, $valid);
         } catch (Exception $ex) {
             $this->logger->error("Nepodařilo se zvalidovat datum", $ex);
             $this->setCode(StatusCodes::METHOD_FAILURE);
-            $this->addData(self::VALID, false);
         }
+        $this->addData(self::VALID, $valid);
+    }
+
+    public function duration_validityGETAction(IRequest $request) {
+        $valid = false;
+        $dateTime = +$request->getParams()[0];
+        $duration = +$request->getParams()[1];
+
+        try {
+            $valid = $this->lecturesmanager->checkDurationValidity($dateTime, $duration);
+        } catch (Exception $ex) {
+            $this->logger->error("Nepodařilo se zvalidovat datum", $ex);
+            $this->setCode(StatusCodes::METHOD_FAILURE);
+        }
+
+        $this->addData(self::VALID, $valid);
     }
 
     public function defaultPOSTAction(IRequest $request) {
         $trainer = +$request->get(LecturesManager::COLUMN_TRAINER);
-        $startTime = +$request->get(LecturesManager::COLUMN_START_TIME);
-        $duration = +$request->get(LecturesManager::COLUMN_DURATION);
+        $timeStart = +$request->get(LecturesManager::COLUMN_TIME_START);
+        $timeEnd = +$request->get(LecturesManager::COLUMN_TIME_END);
         $maxPersons = +$request->get(LecturesManager::COLUMN_MAX_PERSONS);
         $place = $request->get(LecturesManager::COLUMN_PLACE);
         $lectureType = +$request->get(LecturesManager::COLUMN_TYPE);
 
         try {
-            $lectureId = $this->lecturesmanager->insert($trainer, $startTime, $duration, $maxPersons, $place, $lectureType);
+            $lectureId = $this->lecturesmanager->insert($trainer, $timeStart, $timeEnd, $maxPersons, $place, $lectureType);
             $lecture = $this->lecturesmanager->byId($lectureId);
 
             $this->addData(self::LECTURE, $lecture);
         } catch (Exception $ex) {
+            var_dump($ex);
             $this->logger->error("Nepodařilo se založit novou lekci!", $ex);
             $this->setCode(StatusCodes::METHOD_FAILURE);
         }
@@ -116,14 +132,14 @@ class ApiAdminLecturesController extends AdminBaseController {
     public function updatePOSTAction(IRequest $request) {
         $lectureId = +$request->get(LecturesManager::COLUMN_ID);
         $trainer = +$request->get(LecturesManager::COLUMN_TRAINER);
-        $startTime = +$request->get(LecturesManager::COLUMN_START_TIME);
-        $duration = +$request->get(LecturesManager::COLUMN_DURATION);
+        $timeStart = +$request->get(LecturesManager::COLUMN_TIME_START);
+        $timeEnd = +$request->get(LecturesManager::COLUMN_TIME_END);
         $maxPersons = +$request->get(LecturesManager::COLUMN_MAX_PERSONS);
         $place = $request->get(LecturesManager::COLUMN_PLACE);
         $lectureType = +$request->get(LecturesManager::COLUMN_TYPE);
 
         try {
-            $this->lecturesmanager->update($lectureId, $trainer, $startTime, $duration, $maxPersons, $place, $lectureType);
+            $this->lecturesmanager->update($lectureId, $trainer, $timeStart, $timeEnd, $maxPersons, $place, $lectureType);
             $lecture = $this->lecturesmanager->byId($lectureId);
 
             $this->addData(self::LECTURE, $lecture);
@@ -141,6 +157,7 @@ class ApiAdminLecturesController extends AdminBaseController {
             $this->lecturesmanager->delete($lectureId);
             $this->addData(self::LECTURE, $lecture);
         } catch (Exception $ex) {
+            var_dump($ex);
             $this->logger->error("Nepodařilo se smazat lekci s ID: " . $lectureId . "!", $ex);
             $this->setCode(StatusCodes::METHOD_FAILURE);
         }

@@ -168,6 +168,16 @@ class DateUtils {
     }
 
     /**
+     * Zjistí, zda-li datum ukazuje na víkend, či nikoliv
+     *
+     * @param $date string Kontrolované datum
+     * @return bool True, pokud se jedná o víkend, jinak False
+     */
+    public static function isWeekend($date) {
+        return (date('N', strtotime($date)) >= 6);
+    }
+
+    /**
      * Vrací aktuální datum v DB podobě
      *
      * @return string Datum v DB podobě
