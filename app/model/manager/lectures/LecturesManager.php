@@ -125,31 +125,22 @@ class LecturesManager {
         return $this->database->delete(self::TABLE_NAME, "WHERE id = ?", [$lectureId]);
     }
 
-    public function checkDateTimeValidity(int $timestamp) {
+    private function checkTimeValidity(int $lectureId, int $timestamp, string $when) {
         $dateTime = new DateTime();
         $dateTime->setTimestamp($timestamp);
 
-        $this->logger->info($timestamp);
+        $result = $this->database->queryAll(
+            "SELECT id, time_start, time_end FROM lectures WHERE id != ? AND time_start <= ? AND time_end >= ?",
+            [$lectureId, $dateTime->getTimestamp(), $dateTime->getTimestamp()]);
 
-        $this->logger->trace($dateTime);
-        return false;
+        return sizeof($result) == 0;
     }
 
-    /**
-     *
-     *
-     * @param int $timestamp
-     * @param int $duration
-     * @throws Exception
-     */
-    public function checkDurationValidity(int $timestamp, int $duration) {
-        $dateTimeFrom = new DateTime();
-        $dateTimeFrom->setTimestamp($timestamp);
+    public function checkTimeStartValidity(int $lectureId, int $timestamp) {
+        return $this->checkTimeValidity($lectureId, $timestamp, LecturesManager::COLUMN_TIME_START);
+    }
 
-        $dateTimeTo = new DateTime();
-        $dateTimeTo->setTimestamp($timestamp);
-        $dateTimeTo->add(new DateInterval('PT' . $duration . 'M'));
-
-
+    public function checkTimeEndValidity(int $lectureId, int $timestamp) {
+        return $this->checkTimeValidity($lectureId, $timestamp, LecturesManager::COLUMN_TIME_END);
     }
 }

@@ -81,12 +81,28 @@ class ApiAdminLecturesController extends AdminBaseController {
         }
     }
 
-    public function date_time_validityGETAction(IRequest $request) {
+    public function time_validityGETAction(IRequest $request) {
         $valid = false;
-        $dateTime = +$request->getParams()[0];
+        $when = $request->getParams()[0];
+        $dateTime = +$request->getParams()[1];
+        $lectureId = isset($request->getParams()[2]) ? +$request->getParams()[2] : -1;
 
         try {
-            $valid = $this->lecturesmanager->checkDateTimeValidity($dateTime);
+            switch ($when) {
+                case LecturesManager::COLUMN_TIME_START: {
+                    $valid = $this->lecturesmanager->checkTimeStartValidity($lectureId, $dateTime);
+                    break;
+                }
+                case LecturesManager::COLUMN_TIME_END: {
+                    $valid = $this->lecturesmanager->checkTimeEndValidity($lectureId, $dateTime);
+                    break;
+                }
+                default: {
+                    $this->logger->error("Nebylo rozpoznáno, co se má validovat!");
+                    $this->setCode(StatusCodes::BAD_REQUEST);
+                    return;
+                }
+            }
         } catch (Exception $ex) {
             $this->logger->error("Nepodařilo se zvalidovat datum", $ex);
             $this->setCode(StatusCodes::METHOD_FAILURE);
@@ -94,20 +110,33 @@ class ApiAdminLecturesController extends AdminBaseController {
         $this->addData(self::VALID, $valid);
     }
 
-    public function duration_validityGETAction(IRequest $request) {
-        $valid = false;
-        $dateTime = +$request->getParams()[0];
-        $duration = +$request->getParams()[1];
-
-        try {
-            $valid = $this->lecturesmanager->checkDurationValidity($dateTime, $duration);
-        } catch (Exception $ex) {
-            $this->logger->error("Nepodařilo se zvalidovat datum", $ex);
-            $this->setCode(StatusCodes::METHOD_FAILURE);
-        }
-
-        $this->addData(self::VALID, $valid);
-    }
+//    public function time_end_validityGETAction(IRequest $request) {
+//        $valid = false;
+//        $dateTime = +$request->getParams()[0];
+//
+//        try {
+//            $valid = $this->lecturesmanager->checkTimeEndValidity($dateTime);
+//        } catch (Exception $ex) {
+//            $this->logger->error("Nepodařilo se zvalidovat datum", $ex);
+//            $this->setCode(StatusCodes::METHOD_FAILURE);
+//        }
+//        $this->addData(self::VALID, $valid);
+//    }
+//
+//    public function duration_validityGETAction(IRequest $request) {
+//        $valid = false;
+//        $dateTime = +$request->getParams()[0];
+//        $duration = +$request->getParams()[1];
+//
+//        try {
+//            $valid = $this->lecturesmanager->checkDurationValidity($dateTime, $duration);
+//        } catch (Exception $ex) {
+//            $this->logger->error("Nepodařilo se zvalidovat datum", $ex);
+//            $this->setCode(StatusCodes::METHOD_FAILURE);
+//        }
+//
+//        $this->addData(self::VALID, $valid);
+//    }
 
     public function defaultPOSTAction(IRequest $request) {
         $trainer = +$request->get(LecturesManager::COLUMN_TRAINER);
