@@ -152,7 +152,6 @@ class ApiAdminLecturesController extends AdminBaseController {
 
             $this->addData(self::LECTURE, $lecture);
         } catch (Exception $ex) {
-            var_dump($ex);
             $this->logger->error("Nepodařilo se založit novou lekci!", $ex);
             $this->setCode(StatusCodes::METHOD_FAILURE);
         }
@@ -186,7 +185,6 @@ class ApiAdminLecturesController extends AdminBaseController {
             $this->lecturesmanager->delete($lectureId);
             $this->addData(self::LECTURE, $lecture);
         } catch (Exception $ex) {
-            var_dump($ex);
             $this->logger->error("Nepodařilo se smazat lekci s ID: " . $lectureId . "!", $ex);
             $this->setCode(StatusCodes::METHOD_FAILURE);
         }
