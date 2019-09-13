@@ -1,7 +1,7 @@
 <?php
 
 
-namespace app\model\manager\jsw;
+namespace app\model\manager\jwt;
 
 
 use app\model\User;
@@ -10,12 +10,12 @@ use DateTime;
 use Firebase\JWT\JWT;
 use Logger;
 
-class JSWManager {
+class JWTManager {
 
     const
-        JSW_ALGORITHM = "RS256",
-        JSW_PRIVATE_KEY_PATH = __APP_ROOT__ ."/config/private.key",
-        JSW_PUBLIC_KEY_PATH = __APP_ROOT__ ."../public/public.key";
+        JWT_ALGORITHM = "RS256",
+        JWT = __APP_ROOT__ ."/config/private.key",
+        JWT_PUBLIC_KEY_PATH = __APP_ROOT__ ."../public/public.key";
 
     /**
      * @var Logger
@@ -23,22 +23,26 @@ class JSWManager {
     private $logger;
 
     private function readPrivateKey(): string {
-        return file_get_contents(self::JSW_PRIVATE_KEY_PATH);
+        return file_get_contents(self::JWT);
     }
 
     private function readPublicKey(): string {
-        return file_get_contents(self::JSW_PUBLIC_KEY_PATH);
+        return file_get_contents(self::JWT_PUBLIC_KEY_PATH);
     }
 
     public function __construct() {
         $this->logger = Logger::getLogger(__CLASS__);
     }
 
-    public function createJSW(User $user): string {
+    public function createJWT(User $user, bool $remember): string {
         $issuer_claim = JWT_ISSUER;
         $time = new DateTime();
         $issuedat_claim = $time->getTimestamp() * 1000;
-        $time->add(new DateInterval("PT2H"));
+        if ($remember) {
+            $time->add(new DateInterval("P7D"));
+        } else {
+            $time->add(new DateInterval("PT2H"));
+        }
         $expire_claim = $time->getTimestamp() * 1000;
         $token = array(
             "iss" => $issuer_claim,    // Název vlastníka tokenu (název aplikace)
@@ -48,10 +52,10 @@ class JSWManager {
             "role" => $user->getRole() // Role uživatele
         );
         $privKey = $this->readPrivateKey();
-        return JWT::encode($token, $privKey, self::JSW_ALGORITHM);
+        return JWT::encode($token, $privKey, self::JWT_ALGORITHM);
     }
 
     public function validateJSQ(string $jwt) {
-        JWT::decode($jwt, $this->readPublicKey(), [self::JSW_ALGORITHM]);
+        JWT::decode($jwt, $this->readPublicKey(), [self::JWT_ALGORITHM]);
     }
 }

@@ -30,8 +30,18 @@ class ApiAuthController extends BaseApiController {
     }
 
     public function registerPOSTAction(IRequest $request) {
+        $email = $request->get(UserManager::COLUMN_EMAIL);
+        $name = $request->get(UserManager::COLUMN_NAME);
+        $password = $request->get(UserManager::COLUMN_PASSWORD);
+        $password2 = $request->get(UserManager::COLUMN_PASSWORD . '2');
+
+        if ($password != $password2) {
+            $this->setCode(StatusCodes::PRECONDITION_FAILED);
+            return;
+        }
+
         try {
-            $this->usermanager->register($request->get('email'), $request->get('password'));
+            $this->usermanager->register($email, $name, $password);
         } catch (UserException $ex) {
             $this->logger->error($ex);
             $this->setCode(StatusCodes::PRECONDITION_FAILED);
@@ -42,8 +52,12 @@ class ApiAuthController extends BaseApiController {
      * @param IRequest $request
      */
     public function loginPOSTAction(IRequest $request) {
+        $email = $request->get(UserManager::COLUMN_EMAIL);
+        $password = $request->get(UserManager::COLUMN_PASSWORD);
+        $remember = $request->get(UserManager::FLAG_REMEMBER);
+
         try {
-            $jwt = $this->usermanager->login($request->get('email'), $request->get('password'));
+            $jwt = $this->usermanager->login($email, $password, $remember);
             $this->addData('jwt', $jwt);
         } catch (UserException $ex) {
             $this->logger->error($ex);

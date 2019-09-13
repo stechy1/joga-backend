@@ -3,18 +3,35 @@
 namespace app\model\manager\user;
 
 use app\model\database\Database;
-use app\model\manager\jsw\JSWManager;
+use app\model\manager\jwt\JWTManager;
 use app\model\User;
+use app\model\util\StringUtils;
+use DateTime;
 use Logger;
 use PDOException;
 
 /**
  * Class UserManager - Správce jednotlivých uživatelů
  * @Inject Database
- * @Inject JSWManager
+ * @Inject JWTManager
  * @package app\model\manager
  */
 class UserManager {
+
+    const TABLE_NAME = 'users';
+
+    const COLUMN_ID = 'id';
+    const COLUMN_EMAIL = 'email';
+    const COLUMN_PASSWORD = 'password';
+    const COLUMN_ROLE = 'role';
+    const COLUMN_NAME = 'name';
+    const COLUMN_FIRST_LOGIN = 'first_login';
+    const COLUMN_LAST_LOGIN = 'last_login';
+    const COLUMN_BANNED = 'banned';
+    const COLUMN_ACTIVATED = 'activated';
+    const COLUMN_ACTIVATION_CODE = 'activation_code';
+
+    const FLAG_REMEMBER = 'remember';
 
     /**
      * @var Logger
@@ -25,9 +42,9 @@ class UserManager {
      */
     private $database;
     /**
-     * @var JSWManager
+     * @var JWTManager
      */
-    private $jswmanager;
+    private $jwtmanager;
 
     /**
      * UserManager constructor.
@@ -39,15 +56,26 @@ class UserManager {
     /**
      * Zaregistruje nového uživatele
      *
-     * @param $email
-     * @param $password
+     * @param string $email E-mail nového uživatele
+     * @param string $name Jméno nového uživatele
+     * @param string $password Heslo nového uživatele
      * @throws UserException () Pokud se registrace nezdaří
      */
-    public function register($email, $password) {
+    public function register(string $email, string $name, string $password) {
         $pass = password_hash($password, PASSWORD_ARGON2I);
-        $user = array('email' => $email, 'password' => $pass);
+        $dateTime = new DateTime();
+        $randomString = StringUtils::generateRandomToken(20);
+        $activationCode = StringUtils::createHash($pass, $randomString);
         try {
-            $this->database->insert('users', $user);
+            $this->database->insert('users',
+                [
+                    self::COLUMN_EMAIL => $email,
+                    self::COLUMN_PASSWORD => $pass,
+                    self::COLUMN_NAME => $name,
+                    self::COLUMN_FIRST_LOGIN => $dateTime->getTimestamp(),
+                    self::COLUMN_LAST_LOGIN => $dateTime->getTimestamp(),
+                    self::COLUMN_ACTIVATION_CODE => $activationCode
+                ]);
         } catch (PDOException $chyba) {
             $this->logger->error($chyba);
             throw new UserException('Uživatel s touto e-mailovou adresou je již zaregistrovaný.');
@@ -57,12 +85,14 @@ class UserManager {
     /**
      * Přihlásí uživatele do systému
      *
-     * @param $email
-     * @param $password
+     * @param string $email E-mail uživatele
+     * @param string $password Heslo uživatele
+     * @param bool $remember True, pokud si chce uživatel podržet přihlášení déle, jinak False
      * @return string JWT řetěžec
      * @throws UserException Pokud se přihlášení nezdaří
      */
-    public function login($email, $password): string {
+    public function login(string $email, string $password, bool $remember): string {
+        $dateTime = new DateTime();
 //        Získání údajů
         $fromDb = $this->database->queryOne('
                         SELECT id, password, role
@@ -77,7 +107,12 @@ class UserManager {
             throw new UserException('Špatné jméno nebo heslo.');
         }
 
-        return $this->jswmanager->createJSW(new User($fromDb['id'], $email, $fromDb['role'], null));
+        $this->database->update(self::TABLE_NAME,
+            [self::COLUMN_LAST_LOGIN => $dateTime->getTimestamp()],
+            "WHERE id = ?",
+            [$fromDb['id']]);
+
+        return $this->jwtmanager->createJWT(new User($fromDb['id'], $email, $fromDb['role']), $remember);
 
     }
 
