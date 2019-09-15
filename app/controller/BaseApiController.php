@@ -20,7 +20,7 @@ class BaseApiController extends BaseController {
     }
 
     protected function sendResponce() {
-        $this->setCode(StatusCodes::OK);
+//        $this->setCode(StatusCodes::OK);
         echo json_encode($this->data);
     }
 }

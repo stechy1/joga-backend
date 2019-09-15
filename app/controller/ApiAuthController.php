@@ -4,6 +4,7 @@
 namespace app\controller;
 
 
+use app\model\manager\user\UserDataException;
 use app\model\manager\user\UserException;
 use app\model\manager\user\UserManager;
 use app\model\service\request\IRequest;
@@ -61,7 +62,22 @@ class ApiAuthController extends BaseApiController {
             $this->addData('jwt', $jwt);
         } catch (UserException $ex) {
             $this->logger->error($ex);
-            $this->setCode(StatusCodes::PRECONDITION_FAILED);
+            $this->setCode(StatusCodes::UNAUTHORIZED);
+        }
+    }
+
+    public function check_codeGETAction(IRequest $request) {
+        $checkCode = $request->getParams()[0];
+
+        try {
+            $this->usermanager->checkCode($checkCode);
+        } catch (UserDataException $ex) {
+            $this->logger->info("Někdo se pokusil aktivovat účet s nevalidním kontrolním kódem.");
+            $this->logger->info($checkCode);
+            $this->setCode(StatusCodes::BAD_REQUEST);
+        } catch (UserException $ex) {
+            $this->logger->error("Nepodařilo se aktivovat účet");
+            $this->setCode(StatusCodes::METHOD_FAILURE);
         }
     }
 }

@@ -19,6 +19,10 @@ abstract class BaseController {
      */
     protected $data = [];
     /**
+     * @var array $flowData Data used in the controlers live cycle
+     */
+    protected $flowData = [];
+    /**
      * @var int
      */
     private $code = -1;

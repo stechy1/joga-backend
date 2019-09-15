@@ -38,9 +38,15 @@ class RequestFactory {
         $controller = (!empty($parsedURL[0]) ? StringUtils::hyphensToCamel(array_shift($parsedURL)) : 'default');
         if ($controller === 'api') {
             $controller .= !empty($parsedURL[0]) ? StringUtils::hyphensToCamel(array_shift($parsedURL)) : 'default';
-            if ($controller === 'apiadmin') {
-                $controller .= !empty($parsedURL[0]) ? StringUtils::hyphensToCamel(array_shift($parsedURL)) : 'default';
+            switch ($controller) {
+                case 'apiadmin':
+                case 'apiaccount':
+                    $controller .= !empty($parsedURL[0]) ? StringUtils::hyphensToCamel(array_shift($parsedURL)) : 'default';
+                    break;
             }
+//            if ($controller === 'apiadmin') {
+//                $controller .= !empty($parsedURL[0]) ? StringUtils::hyphensToCamel(array_shift($parsedURL)) : 'default';
+//            }
         }
         $requestMethod = $_SERVER['REQUEST_METHOD'] | "";
         $action = (!empty($parsedURL[0]) ? StringUtils::hyphensToCamel($parsedURL[0]) : 'default');
