@@ -39,23 +39,25 @@ class ApiAdminMyController extends AdminBaseController {
             $this->addData(MyManager::INFO_TYPE_MY, $info[MyManager::INFO_TYPE_MY]);
             $this->addData(MyManager::INFO_TYPE_STUDIO, $info[MyManager::INFO_TYPE_STUDIO]);
         } catch (Exception $ex) {
-            $this->logger->error($ex->getMessage(), $ex);
-            $this->setCode(StatusCodes::METHOD_FAILURE);
+            $this->logger->error($ex->getMessage());
+            $this->setCode(StatusCodes::NOT_FOUND);
+            $this->setResponseMessage($ex->getMessage(), self::RESPONSE_MESSAGE_TYPE_ERROR);
         }
     }
 
     public function savePOSTAction(IRequest $request) {
         $what = $request->getParams()[0];
-        var_dump($request);
         if ($what == MyManager::INFO_TYPE_MY || $what == MyManager::INFO_TYPE_STUDIO) {
             try {
                 $this->mymanager->save($what, $request->get(MyManager::COLUMN_INFO_CONTENT));
             } catch (Exception $ex) {
-                $this->logger->error($ex->getMessage(), $ex);
-                $this->setCode(StatusCodes::METHOD_FAILURE);
+                $this->logger->error($ex->getMessage());
+                $this->setCode(StatusCodes::NOT_FOUND);
+                $this->setResponseMessage($ex->getMessage(), self::RESPONSE_MESSAGE_TYPE_ERROR);
             }
         } else {
             $this->setCode(StatusCodes::BAD_REQUEST);
+            $this->setResponseMessage("Neznámý typ ukládané informace!", self::RESPONSE_MESSAGE_TYPE_ERROR);
         }
     }
 
@@ -64,18 +66,18 @@ class ApiAdminMyController extends AdminBaseController {
         if ($what == MyManager::INFO_TYPE_MY || $what == MyManager::INFO_TYPE_STUDIO) {
             try {
                 $this->mymanager->publish($what);
-            } catch (InfoTypeConversionException $ex) {
+            } catch (InfoTypeConversionException | FileManipulationException $ex) {
                 $this->logger->error($ex->getMessage(), $ex);
-                $this->setCode(StatusCodes::METHOD_FAILURE);
-            } catch (FileManipulationException $ex) {
-                $this->logger->error($ex->getMessage(), $ex);
-                $this->setCode(StatusCodes::METHOD_FAILURE);
+                $this->setCode(StatusCodes::NOT_FOUND);
+                $this->setResponseMessage($ex->getMessage(), self::RESPONSE_MESSAGE_TYPE_ERROR);
             } catch (Exception $ex) {
                 $this->logger->error($ex->getMessage(), $ex);
-                $this->setCode(StatusCodes::METHOD_FAILURE);
+                $this->setCode(StatusCodes::NOT_FOUND);
+                $this->setResponseMessage($ex->getMessage(), self::RESPONSE_MESSAGE_TYPE_ERROR);
             }
         } else {
             $this->setCode(StatusCodes::BAD_REQUEST);
+            $this->setResponseMessage("Neznámý typ publikované informace!", self::RESPONSE_MESSAGE_TYPE_ERROR);
         }
     }
 }

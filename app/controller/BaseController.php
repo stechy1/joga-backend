@@ -46,12 +46,9 @@ abstract class BaseController {
         $this->data[$key] = $value;
     }
 
-    protected function checkUser() {
-
-    }
-
     protected function setCode(int $code) {
-        if (!$this->code == -1) {
+        if ($this->code == -1) {
+            $this->logger->trace("Nastavuji status code na: " . $code);
             http_response_code($code);
             $this->code = $code;
         }

@@ -38,14 +38,17 @@ class ApiAuthController extends BaseApiController {
 
         if ($password != $password2) {
             $this->setCode(StatusCodes::PRECONDITION_FAILED);
+            $this->setResponseMessage("Kontrolní heslo se neshoduje se zadaným.", self::RESPONSE_MESSAGE_TYPE_ERROR);
             return;
         }
 
         try {
             $this->usermanager->register($email, $name, $password);
+            $this->setResponseMessage("Účet byl úspěšně vytvořen. Nyní se můžete přihlásit.");
         } catch (UserException $ex) {
             $this->logger->error($ex);
             $this->setCode(StatusCodes::PRECONDITION_FAILED);
+            $this->setResponseMessage($ex->getMessage(), self::RESPONSE_MESSAGE_TYPE_ERROR);
         }
     }
 
@@ -63,6 +66,7 @@ class ApiAuthController extends BaseApiController {
         } catch (UserException $ex) {
             $this->logger->error($ex);
             $this->setCode(StatusCodes::UNAUTHORIZED);
+            $this->setResponseMessage($ex->getMessage(), self::RESPONSE_MESSAGE_TYPE_ERROR);
         }
     }
 
@@ -71,13 +75,10 @@ class ApiAuthController extends BaseApiController {
 
         try {
             $this->usermanager->checkCode($checkCode);
-        } catch (UserDataException $ex) {
-            $this->logger->info("Někdo se pokusil aktivovat účet s nevalidním kontrolním kódem.");
-            $this->logger->info($checkCode);
-            $this->setCode(StatusCodes::BAD_REQUEST);
-        } catch (UserException $ex) {
-            $this->logger->error("Nepodařilo se aktivovat účet");
-            $this->setCode(StatusCodes::METHOD_FAILURE);
+        } catch (UserException | UserDataException $ex) {
+            $this->logger->error($ex->getMessage());
+            $this->setCode(StatusCodes::NOT_FOUND);
+            $this->setResponseMessage($ex->getMessage(), self::RESPONSE_MESSAGE_TYPE_ERROR);
         }
     }
 }

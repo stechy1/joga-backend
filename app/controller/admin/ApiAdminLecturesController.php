@@ -50,24 +50,19 @@ class ApiAdminLecturesController extends AdminBaseController {
     }
 
     public function trainersGETAction(IRequest $request) {
-        try {
-            $trainers = $this->usermanager->trainers();
-            $this->addData(self::TRAINERS, $trainers);
-        } catch (Exception $ex) {
-            $this->logger->error("Nepodařilo se uskutečnit dotaz pro získání trenérů.", $ex);
-            $this->setCode(StatusCodes::METHOD_FAILURE);
-        }
+        $trainers = $this->usermanager->trainers();
+        $this->addData(self::TRAINERS, $trainers);
     }
 
-    public function lecture_TypesGETAction(IRequest $request) {
-        try {
-            $types = $this->lecturesmanager->lectureTypes();
-            $this->addData(self::LECTURE_TYPES, $types);
-        } catch (Exception $ex) {
-            $this->logger->error("Nepodařilo se uskutečnit dotaz pro získání typů lekcí!", $ex);
-            $this->setCode(StatusCodes::METHOD_FAILURE);
-        }
-    }
+//    public function lecture_TypesGETAction(IRequest $request) {
+//        try {
+//            $types = $this->lecturesmanager->lectureTypes();
+//            $this->addData(self::LECTURE_TYPES, $types);
+//        } catch (Exception $ex) {
+//            $this->logger->error("Nepodařilo se uskutečnit dotaz pro získání typů lekcí!", $ex);
+//            $this->setCode(StatusCodes::NOT_FOUND);
+//        }
+//    }
 
     public function idGETAction(IRequest $request) {
         $lectureId = +$request->getParams()[0];
@@ -76,8 +71,9 @@ class ApiAdminLecturesController extends AdminBaseController {
             $lecture = $this->lecturesmanager->byId($lectureId);
             $this->addData(self::LECTURE, $lecture);
         } catch (Exception $ex) {
-            $this->logger->error("Nepodařilo se uskutečnit dotaz pro získání informací o lekci s ID: " . $lectureId . "!", $ex);
-            $this->setCode(StatusCodes::METHOD_FAILURE);
+            $this->logger->error($ex->getMessage());
+            $this->setCode(StatusCodes::NOT_FOUND);
+            $this->setResponseMessage($ex->getMessage(), self::RESPONSE_MESSAGE_TYPE_ERROR);
         }
     }
 
@@ -105,38 +101,10 @@ class ApiAdminLecturesController extends AdminBaseController {
             }
         } catch (Exception $ex) {
             $this->logger->error("Nepodařilo se zvalidovat datum", $ex);
-            $this->setCode(StatusCodes::METHOD_FAILURE);
+            $this->setCode(StatusCodes::NOT_FOUND);
         }
         $this->addData(self::VALID, $valid);
     }
-
-//    public function time_end_validityGETAction(IRequest $request) {
-//        $valid = false;
-//        $dateTime = +$request->getParams()[0];
-//
-//        try {
-//            $valid = $this->lecturesmanager->checkTimeEndValidity($dateTime);
-//        } catch (Exception $ex) {
-//            $this->logger->error("Nepodařilo se zvalidovat datum", $ex);
-//            $this->setCode(StatusCodes::METHOD_FAILURE);
-//        }
-//        $this->addData(self::VALID, $valid);
-//    }
-//
-//    public function duration_validityGETAction(IRequest $request) {
-//        $valid = false;
-//        $dateTime = +$request->getParams()[0];
-//        $duration = +$request->getParams()[1];
-//
-//        try {
-//            $valid = $this->lecturesmanager->checkDurationValidity($dateTime, $duration);
-//        } catch (Exception $ex) {
-//            $this->logger->error("Nepodařilo se zvalidovat datum", $ex);
-//            $this->setCode(StatusCodes::METHOD_FAILURE);
-//        }
-//
-//        $this->addData(self::VALID, $valid);
-//    }
 
     public function defaultPOSTAction(IRequest $request) {
         $trainer = +$request->get(LecturesManager::COLUMN_TRAINER);
@@ -153,7 +121,7 @@ class ApiAdminLecturesController extends AdminBaseController {
             $this->addData(self::LECTURE, $lecture);
         } catch (Exception $ex) {
             $this->logger->error("Nepodařilo se založit novou lekci!", $ex);
-            $this->setCode(StatusCodes::METHOD_FAILURE);
+            $this->setCode(StatusCodes::NOT_FOUND);
         }
     }
 
@@ -173,7 +141,7 @@ class ApiAdminLecturesController extends AdminBaseController {
             $this->addData(self::LECTURE, $lecture);
         } catch (Exception $ex) {
             $this->logger->error("Nepodařilo se upravit lekci s ID: " . $lectureId . "!", $ex);
-            $this->setCode(StatusCodes::METHOD_FAILURE);
+            $this->setCode(StatusCodes::NOT_FOUND);
         }
     }
 
@@ -186,7 +154,7 @@ class ApiAdminLecturesController extends AdminBaseController {
             $this->addData(self::LECTURE, $lecture);
         } catch (Exception $ex) {
             $this->logger->error("Nepodařilo se smazat lekci s ID: " . $lectureId . "!", $ex);
-            $this->setCode(StatusCodes::METHOD_FAILURE);
+            $this->setCode(StatusCodes::NOT_FOUND);
         }
     }
 

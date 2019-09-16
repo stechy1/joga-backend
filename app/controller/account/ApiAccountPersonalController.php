@@ -45,8 +45,9 @@ class ApiAccountPersonalController extends BaseAccountController {
             $data = $this->usermanager->byId($id);
             $this->addData(self::PARAM_PERSONAL_DATA, $data);
         } catch (UserException $ex) {
-            $this->logger->error("Uživatel se zadaným ID {$id} nebyl nalezen!", $ex);
+            $this->logger->error($ex->getMessage());
             $this->setCode(StatusCodes::NOT_FOUND);
+            $this->setResponseMessage($ex->getMessage(), self::RESPONSE_MESSAGE_TYPE_ERROR);
         }
     }
 
@@ -58,12 +59,11 @@ class ApiAccountPersonalController extends BaseAccountController {
 
         try {
             $this->usermanager->update($id, $name, $password);
-        } catch (UserDataException $ex) {
-            $this->logger->error("Nepodařilo se aktualizovat uživatelská data!", $ex);
-            $this->setCode(StatusCodes::METHOD_FAILURE);
-        } catch (UserException $ex) {
-            $this->logger->error("Uživatel pro aktualizaci dat nebyl nalezen!", $ex);
+            $this->setResponseMessage("Údaje byly úspěšně aktualizovány.");
+        } catch (UserException | UserDataException $ex) {
+            $this->logger->error($ex->getMessage());
             $this->setCode(StatusCodes::NOT_FOUND);
+            $this->setResponseMessage($ex->getMessage(), self::RESPONSE_MESSAGE_TYPE_ERROR);
         }
     }
 
@@ -76,12 +76,11 @@ class ApiAccountPersonalController extends BaseAccountController {
 
         try {
             $this->usermanager->updatePassword($id, $oldPassword, $newPassword, $newPassword2);
-        } catch (UserDataException $ex) {
-            $this->logger->error("Nepodařilo se aktualizovat uživatelské heslo!", $ex);
-            $this->setCode(StatusCodes::METHOD_FAILURE);
-        } catch (UserException $ex) {
-            $this->logger->error("Uživatel pro aktualizaci hesla nebyl nalezen!", $ex);
+            $this->setResponseMessage("Heslo bylo úspěšně aktualizováno.");
+        } catch (UserException | UserDataException $ex) {
+            $this->logger->error($ex->getMessage());
             $this->setCode(StatusCodes::NOT_FOUND);
+            $this->setResponseMessage($ex->getMessage(), self::RESPONSE_MESSAGE_TYPE_ERROR);
         }
     }
 
@@ -92,9 +91,11 @@ class ApiAccountPersonalController extends BaseAccountController {
 
         try {
             $this->usermanager->deactivate($id, $password);
-        } catch (UserException $ex) {
-            $this->logger->error("Nepodařilo se deaktivovat uživatelský účet!", $ex);
-            $this->setCode(StatusCodes::METHOD_FAILURE);
+            $this->setResponseMessage("Účet byl úspěšně deaktivovaný.");
+        } catch (UserException | UserDataException $ex) {
+            $this->logger->error($ex->getMessage());
+            $this->setCode(StatusCodes::NOT_FOUND);
+            $this->setResponseMessage($ex->getMessage(), self::RESPONSE_MESSAGE_TYPE_ERROR);
         }
     }
 
@@ -105,9 +106,11 @@ class ApiAccountPersonalController extends BaseAccountController {
 
         try {
             $this->usermanager->disable($id, $password);
-        } catch (UserException $ex) {
-            $this->logger->error("Nepodařilo se zrušit uživatelský účet!", $ex);
-            $this->setCode(StatusCodes::METHOD_FAILURE);
+            $this->setResponseMessage("Účet byl úspěšně zručený.");
+        } catch (UserException | UserDataException $ex) {
+            $this->logger->error($ex->getMessage());
+            $this->setCode(StatusCodes::NOT_FOUND);
+            $this->setResponseMessage($ex->getMessage(), self::RESPONSE_MESSAGE_TYPE_ERROR);
         }
     }
 }

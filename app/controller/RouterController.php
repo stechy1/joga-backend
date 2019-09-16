@@ -5,6 +5,7 @@ namespace app\controller;
 
 use app\model\service\Container;
 use app\model\service\request\IRequest;
+use Exception;
 use Logger;
 use ReflectionException;
 
@@ -34,10 +35,6 @@ class RouterController extends BaseController {
     public function __construct() {
         parent::__construct();
         $this->logger = Logger::getLogger(__CLASS__);
-    }
-
-    private function extractJWT() {
-
     }
 
     /**
@@ -74,7 +71,7 @@ class RouterController extends BaseController {
 
         try {
             call_user_func_array(array($this->controller, $action), array($request));
-        } catch (\Exception $ex) {
+        } catch (Exception $ex) {
             $this->logger->fatal($ex->getMessage());
             $this->logger->debug($ex->getTraceAsString());
         }
@@ -87,7 +84,7 @@ class RouterController extends BaseController {
 
     protected function sendResponce() {
         $this->logger->trace("Odesílám odpověď.");
-        $this->logger->trace(json_encode($this->data));
+        $this->logger->trace(json_encode($this->controller->data));
         $this->controller->sendResponce();
     }
 }

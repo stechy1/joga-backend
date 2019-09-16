@@ -21,7 +21,6 @@ use Logger;
 class ApiAdminCarouselController extends AdminBaseController {
 
     const KEY_IMAGES = "images";
-    const KEY_ERROR = "error";
 
     /**
      * @var Logger
@@ -52,11 +51,11 @@ class ApiAdminCarouselController extends AdminBaseController {
             $this->addData(CarouselManager::COLUMN_IMAGE, $image);
             $this->setCode(StatusCodes::CREATED);
         } catch (ImageUploadException $ex) {
-            $this->addData(self::KEY_ERROR, $ex->getMessage());
             $this->setCode(StatusCodes::CONFLICT);
+            $this->setResponseMessage($ex->getMessage(), self::RESPONSE_MESSAGE_TYPE_ERROR);
         } catch (FileManipulationException $ex) {
-            $this->addData(self::KEY_ERROR, $ex->getMessage());
             $this->setCode(StatusCodes::NOT_ACCEPTABLE);
+            $this->setResponseMessage($ex->getMessage(), self::RESPONSE_MESSAGE_TYPE_ERROR);
         }
     }
 
@@ -70,8 +69,8 @@ class ApiAdminCarouselController extends AdminBaseController {
                 +$request->get(CarouselManager::COLUMN_VIEW_ORDER)
             );
         } catch (ImageProcessException $ex) {
-            $this->addData(self::KEY_ERROR, $ex->getMessage());
             $this->setCode(StatusCodes::NOT_FOUND);
+            $this->setResponseMessage($ex->getMessage(), self::RESPONSE_MESSAGE_TYPE_ERROR);
         }
     }
 
@@ -80,10 +79,10 @@ class ApiAdminCarouselController extends AdminBaseController {
         try {
             $this->carouselmanager->deleteImage($id);
             $this->setCode(StatusCodes::NO_CONTENT);
-        } catch (ImageNotFoundException $e) {
+        } catch (ImageNotFoundException | ImageProcessException $ex) {
+            $this->logger->error($ex->getMessage());
             $this->setCode(StatusCodes::NOT_FOUND);
-        } catch (ImageProcessException $ex) {
-            $this->setCode(StatusCodes::METHOD_FAILURE);
+            $this->setResponseMessage($ex->getMessage(), self::RESPONSE_MESSAGE_TYPE_ERROR);
         }
     }
 

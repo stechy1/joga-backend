@@ -67,7 +67,7 @@ class UserManager {
 
         $hash = $fromDb['password'];
         if (!password_verify($password, $hash)) {
-            throw new UserException('Heslo není validní.');
+            throw new UserException('Heslo není validní!');
         }
     }
 
@@ -110,7 +110,7 @@ class UserManager {
             [$id]);
 
         if ($fromDb == null) {
-            throw new UserException("Uživatel nebyl nalezen");
+            throw new UserException("Uživatel s id ${id} nebyl nalezen!");
         }
 
         return $fromDb;
@@ -144,15 +144,20 @@ class UserManager {
      * @param int $id Id účtu, který se má deaktivovat
      * @param string $password Uživatelské heslo pro kontrolu přístupu k citlivým údajům
      * @throws UserException Pokud heslo není validní
+     * @throws UserDataException Pokud se nepodaří uživatelský účet deaktivovat
      */
     public function deactivate(int $id, string $password) {
         $this->checkPassword($id, $password);
         // TODO ověřit, že uživatel není přihlášený na žádné nadcházející lekci
 
-        $this->database->update(self::TABLE_NAME,
+        $updated = $this->database->update(self::TABLE_NAME,
             [self::COLUMN_ACTIVE => 0],
             "WHERE id = ?",
             [$id]);
+
+        if ($updated == 0) {
+            throw new UserDataException("Uživatelský účet se nepodařilo deaktivovat!");
+        }
     }
 
     /**
@@ -161,15 +166,20 @@ class UserManager {
      * @param int $id Id účtu, který se má deaktivovat
      * @param string $password Uživatelské heslo pro kontrolu přístupu k citlivým údajům
      * @throws UserException Pokud heslo není validní
+     * @throws UserDataException Pokud se nepodaří uživatelský účet zrušit
      */
     public function disable(int $id, string $password) {
         $this->checkPassword($id, $password);
         // TODO ověřit, že uživatel není přihlášený na žádné nadcházející lekci
 
-        $this->database->update(self::TABLE_NAME,
+        $updated = $this->database->update(self::TABLE_NAME,
             [self::COLUMN_DISABLED => 1],
             "WHERE id = ?",
             [$id]);
+
+        if ($updated == 0) {
+            throw new UserDataException("Uživatelský účet se nepodařilo zrušit!");
+        }
     }
 
     /**
@@ -180,7 +190,7 @@ class UserManager {
      * @param string $newPassword Nové heslo
      * @param string $newPassword2 Nové heslo pro kontrolu
      * @throws UserException Pokud heslo není validní
-     * @throws UserDataException
+     * @throws UserDataException Pokud se hedlo nepodaří změnit
      */
     public function updatePassword(int $id, string $oldPassword, string $newPassword, string $newPassword2) {
         $this->checkPassword($id, $oldPassword);
@@ -196,7 +206,7 @@ class UserManager {
             [$id]);
 
         if ($fromDb == 0) {
-            throw new UserDataException("Heslo nebylo změněno!");
+            throw new UserDataException("Heslo se nepodařilo změnit!");
         }
     }
 
@@ -225,7 +235,7 @@ class UserManager {
                 ]);
         } catch (PDOException $chyba) {
             $this->logger->error($chyba);
-            throw new UserException('Uživatel s touto e-mailovou adresou je již zaregistrovaný.');
+            throw new UserException('Uživatel s touto e-mailovou adresou je již zaregistrovaný!');
         }
     }
 
@@ -240,26 +250,26 @@ class UserManager {
      */
     public function login(string $email, string $password, bool $remember): string {
         $dateTime = new DateTime();
-//        Získání údajů
+        // Získání údajů
         $fromDb = $this->database->queryOne('
                         SELECT id, password, role, banned, disabled
                         FROM users
                         WHERE email = ?
                 ', [$email]);
-        if (!$fromDb) throw new UserException('Špatné jméno nebo heslo.');
+        if (!$fromDb) throw new UserException('Špatné jméno nebo heslo!');
 
-//      Ověření hesla
+        // Ověření hesla
         $hash = $fromDb['password'];
         if (!password_verify($password, $hash)) {
-            throw new UserException('Špatné jméno nebo heslo.');
+            throw new UserException('Špatné jméno nebo heslo!');
         }
 
         if ($fromDb[self::COLUMN_BANNED] == 1) {
-            throw new UserException("Uživatelský účet byl zabanován.");
+            throw new UserException("Uživatelský účet byl zabanován!");
         }
 
         if ($fromDb[self::COLUMN_DISABLED] == 1) {
-            throw new UserException("Uživatel zrušil účet.");
+            throw new UserException("Uživatel zrušil účet!");
         }
 
         $this->database->update(self::TABLE_NAME,
@@ -285,7 +295,7 @@ class UserManager {
      *
      * @param string $checkCode Kód, který se má ověřit
      * @throws UserDataException Pokud kód neodpovídá žádnému uživateli
-     * @throws UserException Pokud se nepodaří aktualizovat údaje o uživateli
+     * @throws UserException Pokud se nepodaří aktualizovat informace o aktivačním kódu
      */
     public function checkCode(string $checkCode) {
         $fromDb = $this->database->queryOne("SELECT id FROM users WHERE check_code = ?", [$checkCode]);
@@ -299,7 +309,7 @@ class UserManager {
         $updatedRows = $this->database->update(self::TABLE_NAME, [self::COLUMN_CHECKED => 1], "WHERE id = ?", [$id]);
 
         if ($updatedRows == 0) {
-            throw new UserException("Nepodařilo se aktualizovat údaje o uživateli!");
+            throw new UserException("Kontrolní kód se nepodařilo zpracovat!");
         }
     }
 

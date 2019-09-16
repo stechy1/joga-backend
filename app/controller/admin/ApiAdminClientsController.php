@@ -7,6 +7,7 @@ namespace app\controller\admin;
 use app\model\manager\user\UserManager;
 use app\model\service\request\IRequest;
 use app\model\util\StatusCodes;
+use Exception;
 use Logger;
 
 /**
@@ -40,8 +41,10 @@ class ApiAdminClientsController extends AdminBaseController {
             );
             $this->addData(self::KEY_POST_ALL_CLIENTS, $clients);
             $this->logger->trace($clients);
-        } catch (\Exception $ex) {
+        } catch (Exception $ex) {
+            $this->logger->error($ex->getMessage());
             $this->setCode(StatusCodes::NOT_FOUND);
+            $this->setResponseMessage($ex->getMessage(), self::RESPONSE_MESSAGE_TYPE_ERROR);
         }
     }
 

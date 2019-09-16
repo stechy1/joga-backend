@@ -41,8 +41,9 @@ class ApiAdminLectureTypesController extends AdminBaseController {
             $lectureType = $this->lecturetypesmanager->byId($lectureId);
             $this->addData(self::LECTURE_TYPE, $lectureType);
         } catch (Exception $ex) {
-            $this->logger->error("Nepodařilo se uskutečnit dotaz pro získání informací o typu lekce s ID: " . $lectureId . "!", $ex);
-            $this->setCode(StatusCodes::METHOD_FAILURE);
+            $this->logger->error($ex->getMessage());
+            $this->setCode(StatusCodes::NOT_FOUND);
+            $this->setResponseMessage($ex->getMessage());
         }
     }
 
@@ -58,7 +59,8 @@ class ApiAdminLectureTypesController extends AdminBaseController {
             $this->addData(self::LECTURE_TYPE, $lectureType);
         } catch (Exception $ex) {
             $this->logger->error("Nepodařilo se založit nový typ lekce!", $ex);
-            $this->setCode(StatusCodes::METHOD_FAILURE);
+            $this->setCode(StatusCodes::NOT_FOUND);
+            $this->setResponseMessage($ex->getMessage());
         }
     }
 
@@ -75,7 +77,7 @@ class ApiAdminLectureTypesController extends AdminBaseController {
             $this->addData(self::LECTURE_TYPE, $lecture);
         } catch (Exception $ex) {
             $this->logger->error("Nepodařilo se upravit typ lekce s ID: " . $lectureTypeId . "!", $ex);
-            $this->setCode(StatusCodes::METHOD_FAILURE);
+            $this->setCode(StatusCodes::NOT_FOUND);
         }
     }
 
@@ -89,7 +91,7 @@ class ApiAdminLectureTypesController extends AdminBaseController {
             $this->addData(self::LECTURE_TYPE, $lecture);
         } catch (Exception $ex) {
             $this->logger->error("Nepodařilo se smazat type lekce s ID: " . $lectureTypeId . "!", $ex);
-            $this->setCode(StatusCodes::METHOD_FAILURE);
+            $this->setCode(StatusCodes::NOT_FOUND);
         }
     }
 
