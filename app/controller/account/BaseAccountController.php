@@ -39,7 +39,6 @@ abstract class BaseAccountController extends BaseApiController {
         $headers = $request->getHeaders();
         $this->logger->trace($headers);
         if (!isset($headers['authorization']) && !isset($headers['Authorization'])) {
-            echo var_dump($headers);
             return;
         }
 
@@ -52,9 +51,9 @@ abstract class BaseAccountController extends BaseApiController {
             $this->logger->trace($jwtData);
             $this->flowData[self::JWT_DATA] = $jwtData;
         } catch (Exception $ex) {
-            var_dump($ex);
             $this->logger->error("Nepodařilo se naparsovat JWT!", $ex);
             $this->setCode(StatusCodes::UNAUTHORIZED);
+            $this->setResponseMessage("Přihlašovací token není validní!", self::RESPONSE_MESSAGE_TYPE_ERROR);
             return;
         }
     }
