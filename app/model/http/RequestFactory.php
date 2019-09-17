@@ -1,9 +1,9 @@
 <?php
 
-namespace app\model\factory;
+namespace app\model\http;
 
 
-use app\model\service\request\Request;
+use app\model\http\Request;
 use app\model\util\StringUtils;
 
 class RequestFactory {
@@ -44,9 +44,6 @@ class RequestFactory {
                     $controller .= !empty($parsedURL[0]) ? StringUtils::hyphensToCamel(array_shift($parsedURL)) : 'default';
                     break;
             }
-//            if ($controller === 'apiadmin') {
-//                $controller .= !empty($parsedURL[0]) ? StringUtils::hyphensToCamel(array_shift($parsedURL)) : 'default';
-//            }
         }
         $requestMethod = $_SERVER['REQUEST_METHOD'] | "";
         $action = (!empty($parsedURL[0]) ? StringUtils::hyphensToCamel($parsedURL[0]) : 'default');

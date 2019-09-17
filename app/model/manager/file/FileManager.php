@@ -3,7 +3,7 @@
 namespace app\model\manager\file;
 
 
-use app\model\service\request\FileEntry;
+use app\model\http\FileEntry;
 use Logger;
 
 /**

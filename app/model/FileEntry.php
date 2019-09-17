@@ -1,7 +1,7 @@
 <?php
 
 
-namespace app\model\service\request;
+namespace app\model\http;
 
 
 use Logger;

@@ -3,7 +3,8 @@
 namespace app\controller;
 
 
-use app\model\service\request\IRequest;
+use app\model\http\IRequest;
+use app\model\http\IResponse;
 use Logger;
 
 /**
@@ -13,61 +14,26 @@ use Logger;
  */
 abstract class BaseController {
 
-    private $logger;
     /**
-     * @var array $data
+     * @var Logger
      */
-    protected $data = [];
+    private $logger;
     /**
      * @var array $flowData Data used in the controlers live cycle
      */
     protected $flowData = [];
-    /**
-     * @var int
-     */
-    private $code = -1;
 
     public function __construct() {
         $this->logger = Logger::getLogger(__CLASS__);
     }
 
     /**
-     * Přidá data, která putujou ke klientovi
-     *
-     * @param string $key
-     * @param mixed $value
-     * @param bool $jsonEncode False, pokud se nemají data enkodovat do jsonu, výchozi je true
-     */
-    protected function addData(string $key, $value, $jsonEncode = true) {
-        if ($jsonEncode || is_object($value)) {
-            $this->data[$key] = json_encode($value);
-        }
-
-        $this->data[$key] = $value;
-    }
-
-    protected function setCode(int $code) {
-        if ($this->code == -1) {
-            $this->logger->trace("Nastavuji status code na: " . $code);
-            http_response_code($code);
-            $this->code = $code;
-        }
-    }
-
-    protected function setHeader(string $name, string $value) {
-        if ($value === null) {
-            header_remove($name);
-        } else {
-            header($name . ': ' . $value, true, $this->code);
-        }
-    }
-
-    /**
      * Provede se před hlavním zpracováním požadavku v kontroleru
      *
      * @param IRequest $request Požadavek, který přišel
+     * @param IResponse $response Odpověď ze serveru
      */
-    public function onStartup(IRequest $request) {
+    public function onStartup(IRequest $request, IResponse $response) {
     }
 
     /**
@@ -76,25 +42,30 @@ abstract class BaseController {
     public function onExit() {
     }
 
-    public function defaultGETAction(IRequest $request) {
+    public function defaultGETAction(IRequest $request, IResponse $response) {
         $this->logger->info("defaultGETAction");
     }
 
-    public function defaultPOSTAction(IRequest $request) {
+    public function defaultPOSTAction(IRequest $request, IResponse $response) {
         $this->logger->info("defaultPOSTAction");
     }
 
-    public function defaultPUTAction(IRequest $request) {
+    public function defaultPUTAction(IRequest $request, IResponse $response) {
         $this->logger->info("defaultPUTAction");
     }
 
-    public function defaultPATCHAction(IRequest $request) {
+    public function defaultPATCHAction(IRequest $request, IResponse $response) {
         $this->logger->info("defaultPATCHAction");
     }
 
-    public function defaultDELETEAction(IRequest $request) {
+    public function defaultDELETEAction(IRequest $request, IResponse $response) {
         $this->logger->info("defaultDELETEAction");
     }
 
-    protected abstract function sendResponce();
+    /**
+     * Postará se o odeslání odpovědi
+     *
+     * @param IResponse $response Rozhraní obsahující data pro odpověď ze serveru
+     */
+    protected abstract function sendResponse(IResponse $response): void;
 }

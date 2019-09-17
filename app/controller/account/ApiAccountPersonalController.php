@@ -4,10 +4,11 @@
 namespace app\controller\account;
 
 
+use app\model\http\IResponse;
 use app\model\manager\user\UserDataException;
 use app\model\manager\user\UserException;
 use app\model\manager\user\UserManager;
-use app\model\service\request\IRequest;
+use app\model\http\IRequest;
 use app\model\util\StatusCodes;
 use Logger;
 
@@ -37,21 +38,21 @@ class ApiAccountPersonalController extends BaseAccountController {
         $this->logger = Logger::getLogger(__CLASS__);
     }
 
-    public function defaultGETAction(IRequest $request) {
+    public function defaultGETAction(IRequest $request, IResponse $response) {
         $jwt = $this->flowData[BaseAccountController::JWT_DATA];
         $id = +$jwt->id;
 
         try {
             $data = $this->usermanager->byId($id);
-            $this->addData(self::PARAM_PERSONAL_DATA, $data);
+            $response->addData(self::PARAM_PERSONAL_DATA, $data);
         } catch (UserException $ex) {
             $this->logger->error($ex->getMessage());
-            $this->setCode(StatusCodes::NOT_FOUND);
+            $response->setCode(StatusCodes::NOT_FOUND);
             $this->setResponseMessage($ex->getMessage(), self::RESPONSE_MESSAGE_TYPE_ERROR);
         }
     }
 
-    public function defaultPOSTAction(IRequest $request) {
+    public function defaultPOSTAction(IRequest $request, IResponse $response) {
         $jwt = $this->flowData[BaseAccountController::JWT_DATA];
         $id = +$jwt->id;
         $name = $request->get(UserManager::COLUMN_NAME);
@@ -62,12 +63,12 @@ class ApiAccountPersonalController extends BaseAccountController {
             $this->setResponseMessage("Údaje byly úspěšně aktualizovány.");
         } catch (UserException | UserDataException $ex) {
             $this->logger->error($ex->getMessage());
-            $this->setCode(StatusCodes::NOT_FOUND);
+            $response->setCode(StatusCodes::NOT_FOUND);
             $this->setResponseMessage($ex->getMessage(), self::RESPONSE_MESSAGE_TYPE_ERROR);
         }
     }
 
-    public function update_passwordPOSTAction(IRequest $request) {
+    public function update_passwordPOSTAction(IRequest $request, IResponse $response) {
         $jwt = $this->flowData[BaseAccountController::JWT_DATA];
         $id = +$jwt->id;
         $oldPassword = $request->get(self::PARAM_OLD_PASSWORD);
@@ -79,12 +80,12 @@ class ApiAccountPersonalController extends BaseAccountController {
             $this->setResponseMessage("Heslo bylo úspěšně aktualizováno.");
         } catch (UserException | UserDataException $ex) {
             $this->logger->error($ex->getMessage());
-            $this->setCode(StatusCodes::NOT_FOUND);
+            $response->setCode(StatusCodes::NOT_FOUND);
             $this->setResponseMessage($ex->getMessage(), self::RESPONSE_MESSAGE_TYPE_ERROR);
         }
     }
 
-    public function deactivate_accountPOSTAction(IRequest $request) {
+    public function deactivate_accountPOSTAction(IRequest $request, IResponse $response) {
         $jwt = $this->flowData[BaseAccountController::JWT_DATA];
         $id = +$jwt->id;
         $password = $request->get(UserManager::COLUMN_PASSWORD);
@@ -94,12 +95,12 @@ class ApiAccountPersonalController extends BaseAccountController {
             $this->setResponseMessage("Účet byl úspěšně deaktivovaný.");
         } catch (UserException | UserDataException $ex) {
             $this->logger->error($ex->getMessage());
-            $this->setCode(StatusCodes::NOT_FOUND);
+            $response->setCode(StatusCodes::NOT_FOUND);
             $this->setResponseMessage($ex->getMessage(), self::RESPONSE_MESSAGE_TYPE_ERROR);
         }
     }
 
-    public function disable_accountPOSTAction(IRequest $request) {
+    public function disable_accountPOSTAction(IRequest $request, IResponse $response) {
         $jwt = $this->flowData[BaseAccountController::JWT_DATA];
         $id = +$jwt->id;
         $password = $request->get(UserManager::COLUMN_PASSWORD);
@@ -109,7 +110,7 @@ class ApiAccountPersonalController extends BaseAccountController {
             $this->setResponseMessage("Účet byl úspěšně zručený.");
         } catch (UserException | UserDataException $ex) {
             $this->logger->error($ex->getMessage());
-            $this->setCode(StatusCodes::NOT_FOUND);
+            $response->setCode(StatusCodes::NOT_FOUND);
             $this->setResponseMessage($ex->getMessage(), self::RESPONSE_MESSAGE_TYPE_ERROR);
         }
     }

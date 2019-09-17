@@ -4,9 +4,10 @@
 namespace app\controller\admin;
 
 
+use app\model\http\IResponse;
 use app\model\manager\lectures\LecturesManager;
 use app\model\manager\user\UserManager;
-use app\model\service\request\IRequest;
+use app\model\http\IRequest;
 use app\model\util\StatusCodes;
 use DateTime;
 use Exception;
@@ -43,41 +44,41 @@ class ApiAdminLecturesController extends AdminBaseController {
         $this->logger = Logger::getLogger(__CLASS__);
     }
 
-    public function defaultGETAction(IRequest $request) {
+    public function defaultGETAction(IRequest $request, IResponse $response) {
         $date = +$request->getParams()[0];
         $lectures = $this->lecturesmanager->all($date);
-        $this->addData('lectures', $lectures);
+        $response->addData('lectures', $lectures);
     }
 
-    public function trainersGETAction(IRequest $request) {
+    public function trainersGETAction(IRequest $request, IResponse $response) {
         $trainers = $this->usermanager->trainers();
-        $this->addData(self::TRAINERS, $trainers);
+        $response->addData(self::TRAINERS, $trainers);
     }
 
-//    public function lecture_TypesGETAction(IRequest $request) {
+//    public function lecture_TypesGETAction(IRequest $request, IResponse $response) {
 //        try {
 //            $types = $this->lecturesmanager->lectureTypes();
-//            $this->addData(self::LECTURE_TYPES, $types);
+//            $response->addData(self::LECTURE_TYPES, $types);
 //        } catch (Exception $ex) {
 //            $this->logger->error("Nepodařilo se uskutečnit dotaz pro získání typů lekcí!", $ex);
-//            $this->setCode(StatusCodes::NOT_FOUND);
+//            $response->setCode(StatusCodes::NOT_FOUND);
 //        }
 //    }
 
-    public function idGETAction(IRequest $request) {
+    public function idGETAction(IRequest $request, IResponse $response) {
         $lectureId = +$request->getParams()[0];
 
         try {
             $lecture = $this->lecturesmanager->byId($lectureId);
-            $this->addData(self::LECTURE, $lecture);
+            $response->addData(self::LECTURE, $lecture);
         } catch (Exception $ex) {
             $this->logger->error($ex->getMessage());
-            $this->setCode(StatusCodes::NOT_FOUND);
+            $response->setCode(StatusCodes::NOT_FOUND);
             $this->setResponseMessage($ex->getMessage(), self::RESPONSE_MESSAGE_TYPE_ERROR);
         }
     }
 
-    public function time_validityGETAction(IRequest $request) {
+    public function time_validityGETAction(IRequest $request, IResponse $response) {
         $valid = false;
         $when = $request->getParams()[0];
         $dateTime = +$request->getParams()[1];
@@ -95,18 +96,18 @@ class ApiAdminLecturesController extends AdminBaseController {
                 }
                 default: {
                     $this->logger->error("Nebylo rozpoznáno, co se má validovat!");
-                    $this->setCode(StatusCodes::BAD_REQUEST);
+                    $response->setCode(StatusCodes::BAD_REQUEST);
                     return;
                 }
             }
         } catch (Exception $ex) {
             $this->logger->error("Nepodařilo se zvalidovat datum", $ex);
-            $this->setCode(StatusCodes::NOT_FOUND);
+            $response->setCode(StatusCodes::NOT_FOUND);
         }
-        $this->addData(self::VALID, $valid);
+        $response->addData(self::VALID, $valid);
     }
 
-    public function defaultPOSTAction(IRequest $request) {
+    public function defaultPOSTAction(IRequest $request, IResponse $response) {
         $trainer = +$request->get(LecturesManager::COLUMN_TRAINER);
         $timeStart = +$request->get(LecturesManager::COLUMN_TIME_START);
         $timeEnd = +$request->get(LecturesManager::COLUMN_TIME_END);
@@ -118,14 +119,14 @@ class ApiAdminLecturesController extends AdminBaseController {
             $lectureId = $this->lecturesmanager->insert($trainer, $timeStart, $timeEnd, $maxPersons, $place, $lectureType);
             $lecture = $this->lecturesmanager->byId($lectureId);
 
-            $this->addData(self::LECTURE, $lecture);
+            $response->addData(self::LECTURE, $lecture);
         } catch (Exception $ex) {
             $this->logger->error("Nepodařilo se založit novou lekci!", $ex);
-            $this->setCode(StatusCodes::NOT_FOUND);
+            $response->setCode(StatusCodes::NOT_FOUND);
         }
     }
 
-    public function updatePOSTAction(IRequest $request) {
+    public function updatePOSTAction(IRequest $request, IResponse $response) {
         $lectureId = +$request->get(LecturesManager::COLUMN_ID);
         $trainer = +$request->get(LecturesManager::COLUMN_TRAINER);
         $timeStart = +$request->get(LecturesManager::COLUMN_TIME_START);
@@ -138,23 +139,23 @@ class ApiAdminLecturesController extends AdminBaseController {
             $this->lecturesmanager->update($lectureId, $trainer, $timeStart, $timeEnd, $maxPersons, $place, $lectureType);
             $lecture = $this->lecturesmanager->byId($lectureId);
 
-            $this->addData(self::LECTURE, $lecture);
+            $response->addData(self::LECTURE, $lecture);
         } catch (Exception $ex) {
             $this->logger->error("Nepodařilo se upravit lekci s ID: " . $lectureId . "!", $ex);
-            $this->setCode(StatusCodes::NOT_FOUND);
+            $response->setCode(StatusCodes::NOT_FOUND);
         }
     }
 
-    public function defaultDELETEAction(IRequest $request) {
+    public function defaultDELETEAction(IRequest $request, IResponse $response) {
         $lectureId = +$request->getParams()[0];
 
         try {
             $lecture = $this->lecturesmanager->byId($lectureId);
             $this->lecturesmanager->delete($lectureId);
-            $this->addData(self::LECTURE, $lecture);
+            $response->addData(self::LECTURE, $lecture);
         } catch (Exception $ex) {
             $this->logger->error("Nepodařilo se smazat lekci s ID: " . $lectureId . "!", $ex);
-            $this->setCode(StatusCodes::NOT_FOUND);
+            $response->setCode(StatusCodes::NOT_FOUND);
         }
     }
 

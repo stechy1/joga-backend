@@ -4,8 +4,9 @@
 namespace app\controller\admin;
 
 
+use app\model\http\IResponse;
 use app\model\manager\user\UserManager;
-use app\model\service\request\IRequest;
+use app\model\http\IRequest;
 use app\model\util\StatusCodes;
 use Exception;
 use Logger;
@@ -33,17 +34,17 @@ class ApiAdminClientsController extends AdminBaseController {
         $this->logger = Logger::getLogger(__CLASS__);
     }
 
-    public function defaultPOSTAction(IRequest $request) {
+    public function defaultPOSTAction(IRequest $request, IResponse $response) {
         try {
             $clients = $this->usermanager->all(
                 $request->get(self::KEY_POST_ALL_COUNT, 10),
                 $request->get(self::KEY_POST_ALL_FROM, -1)
             );
-            $this->addData(self::KEY_POST_ALL_CLIENTS, $clients);
+            $response->addData(self::KEY_POST_ALL_CLIENTS, $clients);
             $this->logger->trace($clients);
         } catch (Exception $ex) {
             $this->logger->error($ex->getMessage());
-            $this->setCode(StatusCodes::NOT_FOUND);
+            $response->setCode(StatusCodes::NOT_FOUND);
             $this->setResponseMessage($ex->getMessage(), self::RESPONSE_MESSAGE_TYPE_ERROR);
         }
     }

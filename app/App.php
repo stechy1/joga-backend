@@ -5,11 +5,14 @@ namespace app;
 
 use app\controller\RouterController;
 use app\model\database\IDatabase;
-use app\model\factory\RequestFactory;
+use app\model\http\IResponse;
+use app\model\http\RequestFactory;
+use app\model\http\Response;
 use app\model\service\Container;
-use app\model\service\request\IRequest;
+use app\model\http\IRequest;
 use Logger;
 use PDOException;
+use ReflectionException;
 
 
 /**
@@ -30,6 +33,11 @@ class App {
         $this->logger = Logger::getLogger(__CLASS__);
     }
 
+    /**
+     * Hlavní funkce pro spuštění zpracování požadavku na server
+     *
+     * @throws ReflectionException
+     */
     public function run() {
         /**
          * @var IDatabase $database
@@ -55,12 +63,16 @@ class App {
          * @var $request IRequest
          */
         $request = $reqFactory->createHttpRequest();
+        /**
+         * @var $response IResponse
+         */
+        $response = new Response();
 
 
         if (substr_count($request->getController(), "api") === 0) {
             include __DIR__ . '/../public/index.html';
         } else {
-            $router->defaultAction($request);
+            $router->defaultAction($request, $response);
         }
     }
 }

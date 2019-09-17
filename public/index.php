@@ -19,6 +19,11 @@ Logger::configure("../app/config/log4php.xml");
 
 /** @var Container $container */
 $container = require("../app/bootstrap.php");
-/** @var App $app */
-$app = $container->getInstanceOf('app');
-$app->run();
+
+try {
+    /** @var App $app */
+    $app = $container->getInstanceOf('app');
+    $app->run();
+} catch (Exception $ex) {
+    var_dump($ex);
+}

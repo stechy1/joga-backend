@@ -3,14 +3,16 @@
 namespace app\controller;
 
 
+use app\model\http\IResponse;
 use app\model\service\Container;
-use app\model\service\request\IRequest;
+use app\model\http\IRequest;
 use Exception;
 use Logger;
 use ReflectionException;
 
 /**
  * Class RouterController
+ * Speciální typ kontroleru, který se stará o směrování požadavků
  * @Inject Container
  * @package app\controller
  */
@@ -39,10 +41,11 @@ class RouterController extends BaseController {
 
     /**
      * Výchozí akce kontroleru
-     * @param IRequest $request
-     * @throws ReflectionException
+     * @param IRequest $request Rozhraní reprezentuící požadavek od klienta
+     * @param IResponse $response Rozhraní reprezentující odpověď ze serveru
+     * @throws ReflectionException Pokud se nepodaří najít odpovídající třídu
      */
-    public function defaultAction(IRequest $request) {
+    public function defaultAction(IRequest $request, IResponse $response) {
         $controller = $request->getController() . 'controller';
         $this->logger->trace("Budu zpracovávat kontroller: " . $controller);
 
@@ -55,7 +58,7 @@ class RouterController extends BaseController {
         }
 
         $this->logger->trace("Controller -> onStartup().");
-        $this->controller->onStartup($request);
+        $this->controller->onStartup($request, $response);
 
         $action = $request->getAction();
         $this->logger->trace("Rozpoznal jsem akci kontroleru na: " . $action);
@@ -70,7 +73,7 @@ class RouterController extends BaseController {
         }
 
         try {
-            call_user_func_array(array($this->controller, $action), array($request));
+            call_user_func_array(array($this->controller, $action), array($request, $response));
         } catch (Exception $ex) {
             $this->logger->fatal($ex->getMessage());
             $this->logger->debug($ex->getTraceAsString());
@@ -79,12 +82,12 @@ class RouterController extends BaseController {
         $this->logger->trace("Controller -> onExit().");
         $this->controller->onExit();
 
-        $this->sendResponce();
+        $this->sendResponse($response);
     }
 
-    protected function sendResponce() {
+    protected function sendResponse(IResponse $response): void {
         $this->logger->trace("Odesílám odpověď.");
-        $this->logger->trace(json_encode($this->controller->data));
-        $this->controller->sendResponce();
+        $this->logger->trace(json_encode($response));
+        $this->controller->sendResponse($response);
     }
 }

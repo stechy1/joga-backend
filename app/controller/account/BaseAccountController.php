@@ -5,8 +5,9 @@ namespace app\controller\account;
 
 
 use app\controller\BaseApiController;
+use app\model\http\IResponse;
 use app\model\manager\jwt\JWTManager;
-use app\model\service\request\IRequest;
+use app\model\http\IRequest;
 use app\model\util\StatusCodes;
 use Exception;
 use Logger;
@@ -35,7 +36,7 @@ abstract class BaseAccountController extends BaseApiController {
         $this->logger = Logger::getLogger(__CLASS__);
     }
 
-    public function onStartup(IRequest $request) {
+    public function onStartup(IRequest $request, IResponse $response) {
         $headers = $request->getHeaders();
         $this->logger->trace($headers);
         if (!isset($headers['authorization']) && !isset($headers['Authorization'])) {
@@ -52,7 +53,7 @@ abstract class BaseAccountController extends BaseApiController {
             $this->flowData[self::JWT_DATA] = $jwtData;
         } catch (Exception $ex) {
             $this->logger->error("Nepodařilo se naparsovat JWT!", $ex);
-            $this->setCode(StatusCodes::UNAUTHORIZED);
+            $response->setCode(StatusCodes::UNAUTHORIZED);
             $this->setResponseMessage("Přihlašovací token není validní!", self::RESPONSE_MESSAGE_TYPE_ERROR);
             return;
         }

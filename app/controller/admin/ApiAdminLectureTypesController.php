@@ -4,8 +4,9 @@
 namespace app\controller\admin;
 
 
+use app\model\http\IResponse;
 use app\model\manager\lecture_types\LectureTypesManager;
-use app\model\service\request\IRequest;
+use app\model\http\IRequest;
 use app\model\util\StatusCodes;
 use Exception;
 use Logger;
@@ -29,25 +30,25 @@ class ApiAdminLectureTypesController extends AdminBaseController {
      */
     private $lecturetypesmanager;
 
-    public function defaultGETAction(IRequest $request) {
+    public function defaultGETAction(IRequest $request, IResponse $response) {
         $lectureTypes = $this->lecturetypesmanager->all();
-        $this->addData(self::LECTURE_TYPES, $lectureTypes);
+        $response->addData(self::LECTURE_TYPES, $lectureTypes);
     }
 
-    public function idGETAction(IRequest $request) {
+    public function idGETAction(IRequest $request, IResponse $response) {
         $lectureId = +$request->getParams()[0];
 
         try {
             $lectureType = $this->lecturetypesmanager->byId($lectureId);
-            $this->addData(self::LECTURE_TYPE, $lectureType);
+            $response->addData(self::LECTURE_TYPE, $lectureType);
         } catch (Exception $ex) {
             $this->logger->error($ex->getMessage());
-            $this->setCode(StatusCodes::NOT_FOUND);
+            $response->setCode(StatusCodes::NOT_FOUND);
             $this->setResponseMessage($ex->getMessage());
         }
     }
 
-    public function defaultPOSTAction(IRequest $request) {
+    public function defaultPOSTAction(IRequest $request, IResponse $response) {
         $name = $request->get(LectureTypesManager::COLUMN_NAME);
         $description = $request->get(LectureTypesManager::COLUMN_DESCRIPTION);
         $price = $request->get(LectureTypesManager::COLUMN_PRICE);
@@ -56,15 +57,15 @@ class ApiAdminLectureTypesController extends AdminBaseController {
             $lectureTypeId = $this->lecturetypesmanager->insert($name, $description, $price);
             $lectureType = $this->lecturetypesmanager->byId($lectureTypeId);
 
-            $this->addData(self::LECTURE_TYPE, $lectureType);
+            $response->addData(self::LECTURE_TYPE, $lectureType);
         } catch (Exception $ex) {
             $this->logger->error("Nepodařilo se založit nový typ lekce!", $ex);
-            $this->setCode(StatusCodes::NOT_FOUND);
+            $response->setCode(StatusCodes::NOT_FOUND);
             $this->setResponseMessage($ex->getMessage());
         }
     }
 
-    public function updatePOSTAction(IRequest $request) {
+    public function updatePOSTAction(IRequest $request, IResponse $response) {
         $lectureTypeId = +$request->get(LectureTypesManager::COLUMN_ID);
         $name = $request->get(LectureTypesManager::COLUMN_NAME);
         $description = $request->get(LectureTypesManager::COLUMN_DESCRIPTION);
@@ -74,24 +75,24 @@ class ApiAdminLectureTypesController extends AdminBaseController {
             $this->lecturetypesmanager->update($lectureTypeId, $name, $description, $price);
             $lecture = $this->lecturetypesmanager->byId($lectureTypeId);
 
-            $this->addData(self::LECTURE_TYPE, $lecture);
+            $response->addData(self::LECTURE_TYPE, $lecture);
         } catch (Exception $ex) {
             $this->logger->error("Nepodařilo se upravit typ lekce s ID: " . $lectureTypeId . "!", $ex);
-            $this->setCode(StatusCodes::NOT_FOUND);
+            $response->setCode(StatusCodes::NOT_FOUND);
         }
     }
 
-    public function defaultDELETEAction(IRequest $request) {
+    public function defaultDELETEAction(IRequest $request, IResponse $response) {
         $lectureTypeId = +$request->getParams()[0];
 
         try {
             $lecture = $this->lecturetypesmanager->byId($lectureTypeId);
             $this->lecturetypesmanager->delete($lectureTypeId);
 
-            $this->addData(self::LECTURE_TYPE, $lecture);
+            $response->addData(self::LECTURE_TYPE, $lecture);
         } catch (Exception $ex) {
             $this->logger->error("Nepodařilo se smazat type lekce s ID: " . $lectureTypeId . "!", $ex);
-            $this->setCode(StatusCodes::NOT_FOUND);
+            $response->setCode(StatusCodes::NOT_FOUND);
         }
     }
 

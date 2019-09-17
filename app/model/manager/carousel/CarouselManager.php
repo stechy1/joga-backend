@@ -7,7 +7,7 @@ namespace app\model\manager\carousel;
 use app\model\database\Database;
 use app\model\manager\file\FileManager;
 use app\model\manager\file\FileManipulationException;
-use app\model\service\request\FileEntry;
+use app\model\http\FileEntry;
 use Exception;
 use Logger;
 

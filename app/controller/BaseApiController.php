@@ -4,7 +4,7 @@
 namespace app\controller;
 
 
-use app\model\util\StatusCodes;
+use app\model\http\IResponse;
 use Logger;
 
 class BaseApiController extends BaseController {
@@ -38,15 +38,15 @@ class BaseApiController extends BaseController {
         $this->responseMessageType = $type;
 }
 
-    protected function sendResponce() {
-        $this->setCode(StatusCodes::OK);
+    protected function sendResponse(IResponse $response): void {
         if (isset($this->responseMessage)) {
             $message = [];
             $message['message'] = $this->responseMessage;
             $message['type'] = $this->responseMessageType;
-            $this->addData(self::RESPONSE_MESSAGE, $message);
+            $response->addData(self::RESPONSE_MESSAGE, $message);
         }
 
-        echo json_encode($this->data);
+        http_response_code($response->getCode());
+        echo json_encode($response->getData());
     }
 }
