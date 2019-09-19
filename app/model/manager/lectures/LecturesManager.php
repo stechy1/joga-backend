@@ -44,7 +44,7 @@ class LecturesManager {
         $this->logger = Logger::getLogger(__CLASS__);
     }
 
-    public function all(int $monthTimestamp) {
+    public function all(int $monthTimestamp, bool $showHidden = false) {
         $this->logger->trace($monthTimestamp);
 
         $firstDay = new DateTime();
@@ -68,7 +68,8 @@ class LecturesManager {
                              LEFT JOIN users trainers ON trainers.id = lectures.trainer
                              LEFT JOIN lecture_type ON lecture_type.id = lectures.type
                              LEFT JOIN lecture_reservations clients ON clients.lecture = lectures.id
-                    WHERE time_start BETWEEN ? AND ?
+                    WHERE time_start BETWEEN ? AND ? 
+                    " . (!$showHidden ? "AND published = 1" : "") . "
                     GROUP BY lectures.id, time_start, time_end, max_persons, place, published, trainers.id, trainers.name, lecture_type.name",
             [$firstDay->getTimestamp(), $lastDay->getTimestamp()]);
     }
@@ -93,7 +94,10 @@ class LecturesManager {
     }
 
     /**
+     * Vrátí lekci podle Id
+     *
      * @param int $lectureId
+     * @return array
      * @throws LectureException Pokud lekce nebyla nalezena
      */
     public function byId(int $lectureId) {
@@ -113,6 +117,8 @@ class LecturesManager {
         if ($fromDb == null) {
             throw new LectureException("Lekce s Id: ${$lectureId} nebyla nalezena!");
         }
+
+        return $fromDb;
     }
 
     /**

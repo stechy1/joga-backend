@@ -14,6 +14,7 @@ use Logger;
 /**
  * Class AdminBaseController
  * Třída poskytující základni metody pro kontrolery v administraci
+ * @Inject JWTManager
  * @package app\controller\admin
  */
 abstract class AdminBaseController extends BaseApiController {

@@ -45,8 +45,9 @@ class ApiAdminLecturesController extends AdminBaseController {
     }
 
     public function defaultGETAction(IRequest $request, IResponse $response) {
-        $date = +$request->getParams()[0];
-        $lectures = $this->lecturesmanager->all($date);
+        $timestamp = +$request->getParams()[0];
+
+        $lectures = $this->lecturesmanager->all($timestamp, true);
         $response->addData('lectures', $lectures);
     }
 
@@ -54,16 +55,6 @@ class ApiAdminLecturesController extends AdminBaseController {
         $trainers = $this->usermanager->trainers();
         $response->addData(self::TRAINERS, $trainers);
     }
-
-//    public function lecture_TypesGETAction(IRequest $request, IResponse $response) {
-//        try {
-//            $types = $this->lecturesmanager->lectureTypes();
-//            $response->addData(self::LECTURE_TYPES, $types);
-//        } catch (Exception $ex) {
-//            $this->logger->error("Nepodařilo se uskutečnit dotaz pro získání typů lekcí!", $ex);
-//            $response->setCode(StatusCodes::NOT_FOUND);
-//        }
-//    }
 
     public function idGETAction(IRequest $request, IResponse $response) {
         $lectureId = +$request->getParams()[0];
