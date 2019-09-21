@@ -65,10 +65,17 @@ class CarouselManager {
      * Najde v databázi záznam o jednom obrázku a ten vrátí
      *
      * @param int $id ID obrázku
-     * @return array|null Pole reprezentující data o obrázku, nebo null
+     * @return array Pole reprezentující data o obrázku
+     * @throws ImageNotFoundException Pokud obrázek není nalezen
      */
-    public function one(int $id) {
-        return $this->database->queryOne("SELECT id, name, description, path, enabled, view_order FROM carousel WHERE id = ?", [$id]);
+    public function byId(int $id) {
+        $fromDb = $this->database->queryOne("SELECT id, name, description, path, enabled, view_order FROM carousel WHERE id = ?", [$id]);
+
+        if ($fromDb == null) {
+            throw new ImageNotFoundException("Obrázek nebyl nalezen!");
+        }
+
+        return $fromDb;
     }
 
     /**
@@ -159,7 +166,7 @@ class CarouselManager {
     public function deleteImage(int $id) {
         try {
             $this->database->beginTransaction();
-            $imageRecord = $this->one($id);
+            $imageRecord = $this->byId($id);
             if ($imageRecord == null) {
                 $this->logger->error("Obrázek ke smazání s ID: " . $id . " nebyl nalezen.");
                 throw new ImageNotFoundException("Obrázek nebyl nalezen");

@@ -22,6 +22,7 @@ use Logger;
 class ApiAdminCarouselController extends AdminBaseController {
 
     const KEY_IMAGES = "images";
+    const KEY_IMAGE = "image";
 
     /**
      * @var Logger
@@ -40,6 +41,19 @@ class ApiAdminCarouselController extends AdminBaseController {
     public function defaultGETAction(IRequest $request, IResponse $response) {
         $images = $this->carouselmanager->all();
         $response->addData(self::KEY_IMAGES, $images);
+    }
+
+    public function imageGETAction(IRequest $request, IResponse $response) {
+        $id = +$request->getParams()[0];
+
+        try {
+            $image = $this->carouselmanager->byId($id);
+            $response->addData(self::KEY_IMAGE, $image);
+        }
+        catch (ImageNotFoundException $ex) {
+            $this->setResponseMessage($ex->getMessage(), self::RESPONSE_MESSAGE_TYPE_ERROR);
+            $response->setCode(StatusCodes::NOT_FOUND);
+        }
     }
 
     public function defaultPOSTAction(IRequest $request, IResponse $response) {
@@ -63,23 +77,27 @@ class ApiAdminCarouselController extends AdminBaseController {
     public function updatePOSTAction(IRequest $request, IResponse $response) {
         try {
             $this->carouselmanager->updateImage(
-                $request->get(CarouselManager::COLUMN_IMAGE_ID),
+                +$request->get(CarouselManager::COLUMN_IMAGE_ID),
                 $request->get(CarouselManager::COLUMN_IMAGE_NAME),
                 $request->get(CarouselManager::COLUMN_IMAGE_DESCRIPTION),
                 +$request->get(CarouselManager::COLUMN_ENABLED),
                 +$request->get(CarouselManager::COLUMN_VIEW_ORDER)
             );
+            $image = $this->carouselmanager->byId(+$request->get(CarouselManager::COLUMN_IMAGE_ID));
+            $response->addData(self::KEY_IMAGE, $image);
         } catch (ImageProcessException $ex) {
             $response->setCode(StatusCodes::NOT_FOUND);
             $this->setResponseMessage($ex->getMessage(), self::RESPONSE_MESSAGE_TYPE_ERROR);
+        } catch (ImageNotFoundException $ex) {
         }
     }
 
     public function defaultDELETEAction(IRequest $request, IResponse $response) {
-        $id = $request->getParams()[0];
+        $id = +$request->getParams()[0];
         try {
+            $image = $this->carouselmanager->byId(+$request->get(CarouselManager::COLUMN_IMAGE_ID));
             $this->carouselmanager->deleteImage($id);
-            $response->setCode(StatusCodes::NO_CONTENT);
+            $response->addData(self::KEY_IMAGE, $image);
         } catch (ImageNotFoundException | ImageProcessException $ex) {
             $this->logger->error($ex->getMessage());
             $response->setCode(StatusCodes::NOT_FOUND);
