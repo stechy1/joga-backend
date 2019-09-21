@@ -29,7 +29,7 @@ class UserManager {
     const COLUMN_LAST_LOGIN = 'last_login';
     const COLUMN_BANNED = 'banned';
     const COLUMN_ACTIVE = 'active';
-    const COLUMN_CHECK_CODE = 'activation_code';
+    const COLUMN_CHECK_CODE = 'check_code';
     const COLUMN_CHECKED = 'checked';
     const COLUMN_DISABLED = 'disabled';
 
