@@ -87,7 +87,7 @@ class RouterController extends BaseController {
 
     protected function sendResponse(IResponse $response): void {
         $this->logger->trace("Odesílám odpověď.");
-        $this->logger->trace(json_encode($response));
+//        $this->logger->trace(json_encode($response));
         $this->controller->sendResponse($response);
     }
 }

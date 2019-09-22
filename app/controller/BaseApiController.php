@@ -46,6 +46,7 @@ class BaseApiController extends BaseController {
             $response->addData(self::RESPONSE_MESSAGE, $message);
         }
 
+        $this->logger->trace(json_encode($response->getData()));
         http_response_code($response->getCode());
         echo json_encode($response->getData());
     }
