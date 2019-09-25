@@ -60,6 +60,18 @@ class RouterController extends BaseController {
         $this->logger->trace("Controller -> onStartup().");
         $this->controller->onStartup($request, $response);
 
+        foreach ($this->middlewares as $middleware) {
+            $this->logger->trace($middleware);
+            try {
+                $this->container->getInstanceOf($middleware);
+            } catch (Exception $ex) {
+                $this->logger->error($ex->getMessage());
+                $this->logger->error($ex);
+
+            }
+            //$middleware->apply($request, $response);
+        }
+
         $action = $request->getAction();
         $this->logger->trace("Rozpoznal jsem akci kontroleru na: " . $action);
 

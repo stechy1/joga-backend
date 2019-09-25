@@ -4,6 +4,7 @@ namespace app;
 
 
 use app\controller\RouterController;
+use app\middleware\AuthMiddleware;
 use app\model\database\IDatabase;
 use app\model\http\IResponse;
 use app\model\http\RequestFactory;
@@ -54,6 +55,7 @@ class App {
          * @var $router RouterController
          */
         $router = $this->container->getInstanceOf("RouterController");
+        $router->installMiddleware("authmiddleware");
         /**
          * @var $reqFactory RequestFactory
          */

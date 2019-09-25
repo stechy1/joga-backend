@@ -3,6 +3,7 @@
 namespace app\controller;
 
 
+use app\middleware\IMiddleware;
 use app\model\http\IRequest;
 use app\model\http\IResponse;
 use Logger;
@@ -19,12 +20,16 @@ abstract class BaseController {
      */
     private $logger;
     /**
-     * @var array $flowData Data used in the controlers live cycle
+     * @var IMiddleware[]
      */
-    protected $flowData = [];
+    protected $middlewares;
 
     public function __construct() {
         $this->logger = Logger::getLogger(__CLASS__);
+    }
+
+    public function installMiddleware(string $middleware) {
+        $this->middlewares[] = $middleware;
     }
 
     /**

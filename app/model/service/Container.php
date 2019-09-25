@@ -20,10 +20,17 @@ class Container {
     private $rootFolder;
 
     /**
+     * @var Logger
+     */
+    private $logger;
+
+
+    /**
      * Container constructor.
      */
     private function __construct() {
         $this->map = new stdClass();
+        $this->logger = Logger::getLogger(__CLASS__);
     }
 
     /**

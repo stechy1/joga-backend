@@ -20,6 +20,11 @@ class Response implements IResponse {
     private $data;
 
     /**
+     * @var array $flowData Data used in the controlers live cycle
+     */
+    private $flowData = [];
+
+    /**
      * @var int
      */
     private $httpCode = StatusCodes::OK;
@@ -34,6 +39,14 @@ class Response implements IResponse {
         }
 
         $this->data[$key] = $value;
+    }
+
+    public function addFlowData(string $key, $value): void {
+        $this->flowData[$key] = $value;
+    }
+
+    public function getFlowData(string $key) {
+        return $this->flowData[$key];
     }
 
     public function setCode(int $code): void {

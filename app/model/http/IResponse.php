@@ -14,6 +14,10 @@ interface IResponse {
      */
     public function addData(string $key, $value, $jsonEncode = true): void;
 
+    public function addFlowData(string $key, $value): void;
+
+    public function getFlowData(string $key);
+
     /**
      * Nastaví příslušný http kód
      *
