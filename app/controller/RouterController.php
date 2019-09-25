@@ -51,7 +51,7 @@ class RouterController extends BaseController {
 
         $this->controller = $this->container->getInstanceOf($controller);
         if ($this->controller == null) {
-            $this->logger->error("Kontroller nebyl nalezen.");
+            $this->logger->error("Kontroller " . $controller . " nebyl nalezen!");
             http_response_code(404);
             echo $controller;
             exit(-1);
