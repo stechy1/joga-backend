@@ -47,6 +47,7 @@ class BaseApiController extends BaseController {
         }
 
         $this->logger->trace(json_encode($response->getData()));
+        $this->logger->trace("HTTP response code: " . $response->getCode());
         http_response_code($response->getCode());
         echo json_encode($response->getData());
     }

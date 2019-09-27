@@ -16,7 +16,7 @@ interface IResponse {
 
     public function addFlowData(string $key, $value): void;
 
-    public function getFlowData(string $key);
+    public function getFlowData(string $key, string $defaultValue = null);
 
     /**
      * Nastaví příslušný http kód

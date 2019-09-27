@@ -20,9 +20,13 @@ abstract class BaseController {
      */
     private $logger;
     /**
-     * @var IMiddleware[]
+     * @var string[]
      */
     protected $middlewares;
+    /**
+     * @var bool
+     */
+    protected $valid = true;
 
     public function __construct() {
         $this->logger = Logger::getLogger(__CLASS__);

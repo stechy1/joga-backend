@@ -4,6 +4,7 @@
 namespace app\controller\account;
 
 
+use app\middleware\AuthMiddleware;
 use app\model\http\IResponse;
 use app\model\manager\user\UserDataException;
 use app\model\manager\user\UserException;
@@ -39,7 +40,7 @@ class ApiAccountPersonalController extends BaseAccountController {
     }
 
     public function defaultGETAction(IRequest $request, IResponse $response) {
-        $jwt = $response->getFlowData(BaseAccountController::JWT_DATA);
+        $jwt = $response->getFlowData(AuthMiddleware::JWT_DATA);
         $id = +$jwt->id;
 
         try {
@@ -53,7 +54,7 @@ class ApiAccountPersonalController extends BaseAccountController {
     }
 
     public function defaultPOSTAction(IRequest $request, IResponse $response) {
-        $jwt = $response->getFlowData(BaseAccountController::JWT_DATA);
+        $jwt = $response->getFlowData(AuthMiddleware::JWT_DATA);
         $id = +$jwt->id;
         $name = $request->get(UserManager::COLUMN_NAME);
         $password = $request->get(UserManager::COLUMN_PASSWORD);
@@ -69,7 +70,7 @@ class ApiAccountPersonalController extends BaseAccountController {
     }
 
     public function update_passwordPOSTAction(IRequest $request, IResponse $response) {
-        $jwt = $response->getFlowData(BaseAccountController::JWT_DATA);
+        $jwt = $response->getFlowData(AuthMiddleware::JWT_DATA);
         $id = +$jwt->id;
         $oldPassword = $request->get(self::PARAM_OLD_PASSWORD);
         $newPassword = $request->get(self::PARAM_NEW_PASSWORD);
@@ -86,7 +87,7 @@ class ApiAccountPersonalController extends BaseAccountController {
     }
 
     public function deactivate_accountPOSTAction(IRequest $request, IResponse $response) {
-        $jwt = $response->getFlowData(BaseAccountController::JWT_DATA);
+        $jwt = $response->getFlowData(AuthMiddleware::JWT_DATA);
         $id = +$jwt->id;
         $password = $request->get(UserManager::COLUMN_PASSWORD);
 
@@ -101,7 +102,7 @@ class ApiAccountPersonalController extends BaseAccountController {
     }
 
     public function disable_accountPOSTAction(IRequest $request, IResponse $response) {
-        $jwt = $response->getFlowData(BaseAccountController::JWT_DATA);
+        $jwt = $response->getFlowData(AuthMiddleware::JWT_DATA);
         $id = +$jwt->id;
         $password = $request->get(UserManager::COLUMN_PASSWORD);
 

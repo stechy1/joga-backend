@@ -45,16 +45,17 @@ class Response implements IResponse {
         $this->flowData[$key] = $value;
     }
 
-    public function getFlowData(string $key) {
+    public function getFlowData(string $key, string $defaultValue = null) {
+        if (!isset($this->flowData[$key])) {
+            return $defaultValue;
+        }
+
         return $this->flowData[$key];
     }
 
     public function setCode(int $code): void {
-        if ($this->httpCode == -1) {
-            $this->logger->trace("Nastavuji status code na: " . $code);
-//            http_response_code($code);
-            $this->httpCode = $code;
-        }
+        $this->logger->trace("Nastavuji status code na: " . $code);
+        $this->httpCode = $code;
     }
 
     public function setHeader(string $name, string $value): void {

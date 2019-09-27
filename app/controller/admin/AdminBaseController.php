@@ -4,6 +4,7 @@ namespace app\controller\admin;
 
 
 use app\controller\BaseApiController;
+use app\middleware\AuthMiddleware;
 use app\model\http\IResponse;
 use app\model\manager\jwt\JWTManager;
 use app\model\http\IRequest;
@@ -27,5 +28,15 @@ abstract class AdminBaseController extends BaseApiController {
         parent::__construct();
         $this->logger = Logger::getLogger(__CLASS__);
     }
+
+    public function onStartup(IRequest $request, IResponse $response) {
+        $jwt = $response->getFlowData(AuthMiddleware::JWT_DATA);
+        if ($jwt == null) {
+            $this->setResponseMessage("Pro přístup do aktministrace, musíte být přihlášený!", self::RESPONSE_MESSAGE_TYPE_WARNING);
+            $response->setCode(StatusCodes::UNAUTHORIZED);
+            $this->valid = false;
+        }
+    }
+
 
 }

@@ -3,6 +3,7 @@
 namespace app\controller;
 
 
+use app\middleware\IMiddleware;
 use app\model\http\IResponse;
 use app\model\service\Container;
 use app\model\http\IRequest;
@@ -39,6 +40,10 @@ class RouterController extends BaseController {
         $this->logger = Logger::getLogger(__CLASS__);
     }
 
+    private function fillResponseWithErrorMessage(IResponse $response, FatalRouterException $ex) {
+        $response->addData("response_message", $ex->getErrorMessage());
+    }
+
     /**
      * Výchozí akce kontroleru
      * @param IRequest $request Rozhraní reprezentuící požadavek od klienta
@@ -57,19 +62,29 @@ class RouterController extends BaseController {
             exit(-1);
         }
 
-        $this->logger->trace("Controller -> onStartup().");
-        $this->controller->onStartup($request, $response);
-
         foreach ($this->middlewares as $middleware) {
-            $this->logger->trace($middleware);
+            $this->logger->trace("Aplikuji middleware: " . $middleware);
             try {
-                $this->container->getInstanceOf($middleware);
+                /**
+                 * @var IMiddleware
+                 */
+                $instance = $this->container->getInstanceOf($middleware);
+                $instance->apply($request, $response);
             } catch (Exception $ex) {
                 $this->logger->error($ex->getMessage());
                 $this->logger->error($ex);
 
+                $this->fillResponseWithErrorMessage($response, $ex);
+                $this->controller->sendResponse($response);
+                exit();
             }
-            //$middleware->apply($request, $response);
+        }
+
+        $this->logger->trace("Controller -> onStartup().");
+        $this->controller->onStartup($request, $response);
+        if (!$this->controller->valid) {
+            $this->sendResponse($response);
+            exit();
         }
 
         $action = $request->getAction();
@@ -89,6 +104,7 @@ class RouterController extends BaseController {
         } catch (Exception $ex) {
             $this->logger->fatal($ex->getMessage());
             $this->logger->debug($ex->getTraceAsString());
+            $this->fillResponseWithErrorMessage($response, $ex);
         }
 
         $this->logger->trace("Controller -> onExit().");
@@ -99,7 +115,6 @@ class RouterController extends BaseController {
 
     protected function sendResponse(IResponse $response): void {
         $this->logger->trace("Odesílám odpověď.");
-//        $this->logger->trace(json_encode($response));
         $this->controller->sendResponse($response);
     }
 }

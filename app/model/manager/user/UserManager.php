@@ -252,7 +252,7 @@ class UserManager {
         $dateTime = new DateTime();
         // Získání údajů
         $fromDb = $this->database->queryOne('
-                        SELECT id, password, role, banned, disabled
+                        SELECT id, passwordd, role, banned, disabled
                         FROM users
                         WHERE email = ?
                 ', [$email]);
