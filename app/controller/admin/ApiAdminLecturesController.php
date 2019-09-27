@@ -65,7 +65,7 @@ class ApiAdminLecturesController extends AdminBaseController {
         } catch (Exception $ex) {
             $this->logger->error($ex->getMessage());
             $response->setCode(StatusCodes::NOT_FOUND);
-            $this->setResponseMessage($ex->getMessage(), self::RESPONSE_MESSAGE_TYPE_ERROR);
+            $this->setResponseMessage($ex->getMessage(), Constants::RESPONSE_MESSAGE_TYPE_ERROR);
         }
     }
 

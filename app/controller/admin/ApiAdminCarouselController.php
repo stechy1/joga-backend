@@ -51,7 +51,7 @@ class ApiAdminCarouselController extends AdminBaseController {
             $response->addData(self::KEY_IMAGE, $image);
         }
         catch (ImageNotFoundException $ex) {
-            $this->setResponseMessage($ex->getMessage(), self::RESPONSE_MESSAGE_TYPE_ERROR);
+            $this->setResponseMessage($ex->getMessage(), Constants::RESPONSE_MESSAGE_TYPE_ERROR);
             $response->setCode(StatusCodes::NOT_FOUND);
         }
     }
@@ -67,10 +67,10 @@ class ApiAdminCarouselController extends AdminBaseController {
             $response->setCode(StatusCodes::CREATED);
         } catch (ImageUploadException $ex) {
             $response->setCode(StatusCodes::CONFLICT);
-            $this->setResponseMessage($ex->getMessage(), self::RESPONSE_MESSAGE_TYPE_ERROR);
+            $this->setResponseMessage($ex->getMessage(), Constants::RESPONSE_MESSAGE_TYPE_ERROR);
         } catch (FileManipulationException $ex) {
             $response->setCode(StatusCodes::NOT_ACCEPTABLE);
-            $this->setResponseMessage($ex->getMessage(), self::RESPONSE_MESSAGE_TYPE_ERROR);
+            $this->setResponseMessage($ex->getMessage(), Constants::RESPONSE_MESSAGE_TYPE_ERROR);
         }
     }
 
@@ -87,7 +87,7 @@ class ApiAdminCarouselController extends AdminBaseController {
             $response->addData(self::KEY_IMAGE, $image);
         } catch (ImageProcessException $ex) {
             $response->setCode(StatusCodes::NOT_FOUND);
-            $this->setResponseMessage($ex->getMessage(), self::RESPONSE_MESSAGE_TYPE_ERROR);
+            $this->setResponseMessage($ex->getMessage(), Constants::RESPONSE_MESSAGE_TYPE_ERROR);
         } catch (ImageNotFoundException $ex) {
         }
     }
@@ -101,7 +101,7 @@ class ApiAdminCarouselController extends AdminBaseController {
         } catch (ImageNotFoundException | ImageProcessException $ex) {
             $this->logger->error($ex->getMessage());
             $response->setCode(StatusCodes::NOT_FOUND);
-            $this->setResponseMessage($ex->getMessage(), self::RESPONSE_MESSAGE_TYPE_ERROR);
+            $this->setResponseMessage($ex->getMessage(), Constants::RESPONSE_MESSAGE_TYPE_ERROR);
         }
     }
 

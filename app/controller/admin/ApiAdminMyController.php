@@ -42,7 +42,7 @@ class ApiAdminMyController extends AdminBaseController {
         } catch (Exception $ex) {
             $this->logger->error($ex->getMessage());
             $response->setCode(StatusCodes::NOT_FOUND);
-            $this->setResponseMessage($ex->getMessage(), self::RESPONSE_MESSAGE_TYPE_ERROR);
+            $this->setResponseMessage($ex->getMessage(), Constants::RESPONSE_MESSAGE_TYPE_ERROR);
         }
     }
 
@@ -54,11 +54,11 @@ class ApiAdminMyController extends AdminBaseController {
             } catch (Exception $ex) {
                 $this->logger->error($ex->getMessage());
                 $response->setCode(StatusCodes::NOT_FOUND);
-                $this->setResponseMessage($ex->getMessage(), self::RESPONSE_MESSAGE_TYPE_ERROR);
+                $this->setResponseMessage($ex->getMessage(), Constants::RESPONSE_MESSAGE_TYPE_ERROR);
             }
         } else {
             $response->setCode(StatusCodes::BAD_REQUEST);
-            $this->setResponseMessage("Neznámý typ ukládané informace!", self::RESPONSE_MESSAGE_TYPE_ERROR);
+            $this->setResponseMessage("Neznámý typ ukládané informace!", Constants::RESPONSE_MESSAGE_TYPE_ERROR);
         }
     }
 
@@ -70,15 +70,15 @@ class ApiAdminMyController extends AdminBaseController {
             } catch (InfoTypeConversionException | FileManipulationException $ex) {
                 $this->logger->error($ex->getMessage(), $ex);
                 $response->setCode(StatusCodes::NOT_FOUND);
-                $this->setResponseMessage($ex->getMessage(), self::RESPONSE_MESSAGE_TYPE_ERROR);
+                $this->setResponseMessage($ex->getMessage(), Constants::RESPONSE_MESSAGE_TYPE_ERROR);
             } catch (Exception $ex) {
                 $this->logger->error($ex->getMessage(), $ex);
                 $response->setCode(StatusCodes::NOT_FOUND);
-                $this->setResponseMessage($ex->getMessage(), self::RESPONSE_MESSAGE_TYPE_ERROR);
+                $this->setResponseMessage($ex->getMessage(), Constants::RESPONSE_MESSAGE_TYPE_ERROR);
             }
         } else {
             $response->setCode(StatusCodes::BAD_REQUEST);
-            $this->setResponseMessage("Neznámý typ publikované informace!", self::RESPONSE_MESSAGE_TYPE_ERROR);
+            $this->setResponseMessage("Neznámý typ publikované informace!", Constants::RESPONSE_MESSAGE_TYPE_ERROR);
         }
     }
 }

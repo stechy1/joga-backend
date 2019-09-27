@@ -39,7 +39,7 @@ class ApiAuthController extends BaseApiController {
 
         if ($password != $password2) {
             $response->setCode(StatusCodes::PRECONDITION_FAILED);
-            $this->setResponseMessage("Kontrolní heslo se neshoduje se zadaným.", self::RESPONSE_MESSAGE_TYPE_ERROR);
+            $this->setResponseMessage("Kontrolní heslo se neshoduje se zadaným.", Constants::RESPONSE_MESSAGE_TYPE_ERROR);
             return;
         }
 
@@ -49,13 +49,10 @@ class ApiAuthController extends BaseApiController {
         } catch (UserException $ex) {
             $this->logger->error($ex);
             $response->setCode(StatusCodes::PRECONDITION_FAILED);
-            $this->setResponseMessage($ex->getMessage(), self::RESPONSE_MESSAGE_TYPE_ERROR);
+            $this->setResponseMessage($ex->getMessage(), Constants::RESPONSE_MESSAGE_TYPE_ERROR);
         }
     }
 
-    /**
-     * @param IRequest $request
-     */
     public function loginPOSTAction(IRequest $request, IResponse $response) {
         $email = $request->get(UserManager::COLUMN_EMAIL);
         $password = $request->get(UserManager::COLUMN_PASSWORD);
@@ -67,7 +64,7 @@ class ApiAuthController extends BaseApiController {
         } catch (UserException $ex) {
             $this->logger->error($ex);
             $response->setCode(StatusCodes::UNAUTHORIZED);
-            $this->setResponseMessage($ex->getMessage(), self::RESPONSE_MESSAGE_TYPE_ERROR);
+            $this->setResponseMessage($ex->getMessage(), Constants::RESPONSE_MESSAGE_TYPE_ERROR);
         }
     }
 
@@ -79,7 +76,7 @@ class ApiAuthController extends BaseApiController {
         } catch (UserException | UserDataException $ex) {
             $this->logger->error($ex->getMessage());
             $response->setCode(StatusCodes::NOT_FOUND);
-            $this->setResponseMessage($ex->getMessage(), self::RESPONSE_MESSAGE_TYPE_ERROR);
+            $this->setResponseMessage($ex->getMessage(), Constants::RESPONSE_MESSAGE_TYPE_ERROR);
         }
     }
 }

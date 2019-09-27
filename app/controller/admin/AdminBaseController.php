@@ -32,7 +32,7 @@ abstract class AdminBaseController extends BaseApiController {
     public function onStartup(IRequest $request, IResponse $response) {
         $jwt = $response->getFlowData(AuthMiddleware::JWT_DATA);
         if ($jwt == null) {
-            $this->setResponseMessage("Pro přístup do aktministrace, musíte být přihlášený!", self::RESPONSE_MESSAGE_TYPE_WARNING);
+            $this->setResponseMessage("Pro přístup do aktministrace, musíte být přihlášený!", Constants::RESPONSE_MESSAGE_TYPE_WARNING);
             $response->setCode(StatusCodes::UNAUTHORIZED);
             $this->valid = false;
         }

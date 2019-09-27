@@ -9,12 +9,6 @@ use Logger;
 
 class BaseApiController extends BaseController {
 
-    private const RESPONSE_MESSAGE = "response_message";
-    protected const RESPONSE_MESSAGE_TYPE_SUCCESS = 0;
-    protected const RESPONSE_MESSAGE_TYPE_INFO = 1;
-    protected const RESPONSE_MESSAGE_TYPE_WARNING = 2;
-    protected const RESPONSE_MESSAGE_TYPE_ERROR = 3;
-
     /**
      * @var Logger
      */
@@ -26,14 +20,14 @@ class BaseApiController extends BaseController {
     /**
      * @var int
      */
-    private $responseMessageType = self::RESPONSE_MESSAGE_TYPE_SUCCESS;
+    private $responseMessageType = Constants::RESPONSE_MESSAGE_TYPE_SUCCESS;
 
     public function __construct() {
         parent::__construct();
         $this->logger = Logger::getLogger(__CLASS__);
     }
 
-    protected function setResponseMessage(string $message, int $type = self::RESPONSE_MESSAGE_TYPE_SUCCESS) {
+    protected function setResponseMessage(string $message, int $type = Constants::RESPONSE_MESSAGE_TYPE_SUCCESS) {
         $this->responseMessage = $message;
         $this->responseMessageType = $type;
 }
@@ -43,7 +37,7 @@ class BaseApiController extends BaseController {
             $message = [];
             $message['message'] = $this->responseMessage;
             $message['type'] = $this->responseMessageType;
-            $response->addData(self::RESPONSE_MESSAGE, $message);
+            $response->addData(Constants::RESPONSE_MESSAGE, $message);
         }
 
         $this->logger->trace(json_encode($response->getData()));

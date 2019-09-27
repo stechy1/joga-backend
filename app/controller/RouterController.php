@@ -4,9 +4,11 @@ namespace app\controller;
 
 
 use app\middleware\IMiddleware;
+use app\middleware\MiddlewareException;
 use app\model\http\IResponse;
 use app\model\service\Container;
 use app\model\http\IRequest;
+use app\model\util\StatusCodes;
 use Exception;
 use Logger;
 use ReflectionException;
@@ -40,8 +42,15 @@ class RouterController extends BaseController {
         $this->logger = Logger::getLogger(__CLASS__);
     }
 
-    private function fillResponseWithErrorMessage(IResponse $response, FatalRouterException $ex) {
-        $response->addData("response_message", $ex->getErrorMessage());
+    private function fillResponseWithErrorMessageFromException(IResponse $response, Exception $ex): void {
+        $this->fillResponseWithErrorMessage($response, $ex->getMessage(), $ex->getCode());
+    }
+
+    private function fillResponseWithErrorMessage(IResponse $response, string $text, int $code): void {
+        $message = [];
+        $message['message'] = $text;
+        $message['type'] = $code;
+        $response->addData(Constants::RESPONSE_MESSAGE, $message);
     }
 
     /**
@@ -56,10 +65,10 @@ class RouterController extends BaseController {
 
         $this->controller = $this->container->getInstanceOf($controller);
         if ($this->controller == null) {
-            $this->logger->error("Kontroller " . $controller . " nebyl nalezen!");
-            http_response_code(404);
-            echo $controller;
-            exit(-1);
+            $this->logger->error("Kontroller: " . $controller . " nebyl nalezen!");
+            $this->fillResponseWithErrorMessage($response, "Kontroller: " . $controller . " nebyl nalezen!", StatusCodes::NOT_FOUND);
+            $this->sendResponse($response);
+            exit();
         }
 
         foreach ($this->middlewares as $middleware) {
@@ -70,11 +79,11 @@ class RouterController extends BaseController {
                  */
                 $instance = $this->container->getInstanceOf($middleware);
                 $instance->apply($request, $response);
-            } catch (Exception $ex) {
+            } catch (MiddlewareException $ex) {
                 $this->logger->error($ex->getMessage());
                 $this->logger->error($ex);
 
-                $this->fillResponseWithErrorMessage($response, $ex);
+                $this->fillResponseWithErrorMessageFromException($response, $ex);
                 $this->controller->sendResponse($response);
                 exit();
             }
@@ -104,7 +113,8 @@ class RouterController extends BaseController {
         } catch (Exception $ex) {
             $this->logger->fatal($ex->getMessage());
             $this->logger->debug($ex->getTraceAsString());
-            $this->fillResponseWithErrorMessage($response, $ex);
+            $this->fillResponseWithErrorMessageFromException($response, $ex);
+
         }
 
         $this->logger->trace("Controller -> onExit().");
