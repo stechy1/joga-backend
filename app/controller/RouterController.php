@@ -43,7 +43,7 @@ class RouterController extends BaseController {
     }
 
     private function fillResponseWithErrorMessageFromException(IResponse $response, Exception $ex): void {
-        $this->fillResponseWithErrorMessage($response, $ex->getMessage(), $ex->getCode());
+        $this->fillResponseWithErrorMessage($response, $ex->getMessage(), $ex->getCode() || -1);
     }
 
     private function fillResponseWithErrorMessage(IResponse $response, string $text, int $code): void {
@@ -66,7 +66,8 @@ class RouterController extends BaseController {
         $this->controller = $this->container->getInstanceOf($controller);
         if ($this->controller == null) {
             $this->logger->error("Kontroller: " . $controller . " nebyl nalezen!");
-            $this->fillResponseWithErrorMessage($response, "Kontroller: " . $controller . " nebyl nalezen!", StatusCodes::NOT_FOUND);
+            $this->fillResponseWithErrorMessage($response, "Kontroller: " . $controller . " nebyl nalezen!", Constants::RESPONSE_MESSAGE_TYPE_ERROR);
+            $response->setCode(StatusCodes::BAD_REQUEST);
             $this->sendResponse($response);
             exit();
         }
@@ -111,10 +112,11 @@ class RouterController extends BaseController {
         try {
             call_user_func_array(array($this->controller, $action), array($request, $response));
         } catch (Exception $ex) {
+            $this->logger->fatal("General exception handler!");
             $this->logger->fatal($ex->getMessage());
             $this->logger->debug($ex->getTraceAsString());
-            $this->fillResponseWithErrorMessageFromException($response, $ex);
-
+            $this->fillResponseWithErrorMessage($response, "Nastala neočekávaná chyba na straně serveru!", Constants::RESPONSE_MESSAGE_TYPE_ERROR);
+            $response->setCode(StatusCodes::BAD_REQUEST);
         }
 
         $this->logger->trace("Controller -> onExit().");

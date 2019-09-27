@@ -4,8 +4,6 @@
 use app\App;
 use app\model\service\Container;
 
-//session_start();
-
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
@@ -16,6 +14,7 @@ date_default_timezone_set('Europe/Prague');
 $loader = require "../vendor/autoload.php";
 
 Logger::configure("../app/config/log4php.xml");
+$logger = Logger::getLogger("index");
 
 /** @var Container $container */
 $container = require("../app/bootstrap.php");
@@ -25,5 +24,6 @@ try {
     $app = $container->getInstanceOf('app');
     $app->run();
 } catch (Exception $ex) {
-    var_dump($ex);
+    $logger->fatal($ex->getMessage());
+    $logger->fatal($ex->getTraceAsString());
 }
