@@ -4,6 +4,8 @@
 namespace app\controller\admin;
 
 
+use app\controller\Constants;
+use app\model\http\BadQueryStringException;
 use app\model\http\IResponse;
 use app\model\manager\carousel\CarouselManager;
 use app\model\manager\carousel\ImageNotFoundException;
@@ -44,10 +46,13 @@ class ApiAdminCarouselController extends AdminBaseController {
     }
 
     public function imageGETAction(IRequest $request, IResponse $response) {
-        $id = +$request->getParams()[0];
+        $id = $request->getParam(0);
+        if (!is_numeric($id)) {
+            throw new BadQueryStringException("ID obrázku není zadané, nebo nemá správný formát!");
+        }
 
         try {
-            $image = $this->carouselmanager->byId($id);
+            $image = $this->carouselmanager->byId(+$id);
             $response->addData(self::KEY_IMAGE, $image);
         }
         catch (ImageNotFoundException $ex) {
@@ -93,10 +98,14 @@ class ApiAdminCarouselController extends AdminBaseController {
     }
 
     public function defaultDELETEAction(IRequest $request, IResponse $response) {
-        $id = +$request->getParams()[0];
+        $id = $request->getParam(0);
+        if (!is_numeric($id)) {
+            throw new BadQueryStringException("ID obrázku není zadané, nebo nemá správný formát!");
+        }
+
         try {
             $image = $this->carouselmanager->byId(+$request->get(CarouselManager::COLUMN_IMAGE_ID));
-            $this->carouselmanager->deleteImage($id);
+            $this->carouselmanager->deleteImage(+$id);
             $response->addData(self::KEY_IMAGE, $image);
         } catch (ImageNotFoundException | ImageProcessException $ex) {
             $this->logger->error($ex->getMessage());

@@ -4,6 +4,7 @@
 namespace app\controller;
 
 
+use app\model\http\BadQueryStringException;
 use app\model\http\IRequest;
 use app\model\http\IResponse;
 use app\model\manager\carousel\CarouselManager;
@@ -57,18 +58,23 @@ class ApiGeneralController extends BaseApiController {
     }
 
     public function lecturesGETAction(IRequest $request, IResponse $response) {
-        $timestamp = +$request->getParams()[0];
+        $timestamp = $request->getParam(0);
+        if (!is_string($timestamp)) {
+            throw new BadQueryStringException("Timestamp není zadaný, nebo nemá správný formát!");
+        }
 
-        $lectures = $this->lecturesmanager->all($timestamp);
+        $lectures = $this->lecturesmanager->all(+$timestamp);
         $response->addData(self::LECTURES, $lectures);
     }
 
     public function lecture_typeGETAction(IRequest $request, IResponse $response) {
-        $lectureTypeId = +$request->getParams()[0];
-        $this->logger->trace($lectureTypeId);
+        $lectureTypeId = $request->getParam(0);
+        if (!is_numeric($lectureTypeId)) {
+            throw new BadQueryStringException("Typ informace není zadaný, nebo nemá správný formát!");
+        }
 
         try {
-            $lectureType = $this->lecturetypesmanager->byId($lectureTypeId);
+            $lectureType = $this->lecturetypesmanager->byId(+$lectureTypeId);
             $response->addData(self::LECTURE_TYPE, $lectureType);
         } catch (LectureTypeException $ex) {
             $this->setResponseMessage($ex->getMessage());

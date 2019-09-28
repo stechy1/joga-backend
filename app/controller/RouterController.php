@@ -5,6 +5,7 @@ namespace app\controller;
 
 use app\middleware\IMiddleware;
 use app\middleware\MiddlewareException;
+use app\model\http\BadQueryStringException;
 use app\model\http\IResponse;
 use app\model\service\Container;
 use app\model\http\IRequest;
@@ -104,13 +105,17 @@ class RouterController extends BaseController {
             $this->logger->trace("Akce nebyla nalezena, používám výchozí.");
             $action = $request->getDefaultAction();
         } else {
-            if (count($request->getParams()) > 1) {
+            if ($request->hasParams(1)) {
                 $request->spliceParams();
             }
         }
 
         try {
             call_user_func_array(array($this->controller, $action), array($request, $response));
+        } catch (BadQueryStringException $ex) {
+            $this->logger->error("Request with bad params occured!");
+            $this->fillResponseWithErrorMessage($response, $ex->getMessage(), Constants::RESPONSE_MESSAGE_TYPE_WARNING);
+            $response->setCode(StatusCodes::BAD_REQUEST);
         } catch (Exception $ex) {
             $this->logger->fatal("General exception handler!");
             $this->logger->fatal($ex->getMessage());

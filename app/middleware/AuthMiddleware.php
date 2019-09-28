@@ -4,11 +4,9 @@
 namespace app\middleware;
 
 
-use app\controller\FatalRouterException;
 use app\model\http\IRequest;
 use app\model\http\IResponse;
 use app\model\manager\jwt\JWTManager;
-use app\model\manager\user\UserException;
 use app\model\util\StatusCodes;
 use Exception;
 use Logger;
@@ -54,15 +52,8 @@ class AuthMiddleware implements IMiddleware {
             $this->logger->trace($jwtData);
             $response->addFlowData(self::JWT_DATA, $jwtData);
         } catch (Exception $ex) {
+            $response->setCode(StatusCodes::UNAUTHORIZED);
             throw new MiddlewareException("Nepodařilo se naparsovat JWT!");
-//            $this->logger->error("Nepodařilo se naparsovat JWT!", $ex);
-//            throw new FatalRouterException("Přihlašovací token není validní!", StatusCodes::UNAUTHORIZED);
-//            $message = [];
-//            $message['message'] = "Přihlšovací token není validní!";
-//            $message['type'] = 3;
-//            $response->addData("response_message", $message);
-//            $response->setCode(StatusCodes::UNAUTHORIZED);
-//            throw new UserException("Přihlašovací token není validní!");
         }
     }
 

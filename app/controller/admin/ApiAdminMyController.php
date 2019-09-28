@@ -4,6 +4,8 @@
 namespace app\controller\admin;
 
 
+use app\controller\Constants;
+use app\model\http\BadQueryStringException;
 use app\model\http\IResponse;
 use app\model\manager\file\FileManipulationException;
 use app\model\manager\file\InfoTypeConversionException;
@@ -47,7 +49,11 @@ class ApiAdminMyController extends AdminBaseController {
     }
 
     public function savePOSTAction(IRequest $request, IResponse $response) {
-        $what = $request->getParams()[0];
+        $what = $request->getParam(0);
+        if (!is_string($what)) {
+            throw new BadQueryStringException("Typ informace není zadaný, nebo nemá správný formát!");
+        }
+
         if ($what == MyManager::INFO_TYPE_MY || $what == MyManager::INFO_TYPE_STUDIO) {
             try {
                 $this->mymanager->save($what, $request->get(MyManager::COLUMN_INFO_CONTENT));
@@ -63,7 +69,11 @@ class ApiAdminMyController extends AdminBaseController {
     }
 
     public function publishPATCHAction(IRequest $request, IResponse $response) {
-        $what = $request->getParams()[0];
+        $what = $request->getParam(0);
+        if (!is_string($what)) {
+            throw new BadQueryStringException("Typ informace není zadaný, nebo nemá správný formát!");
+        }
+
         if ($what == MyManager::INFO_TYPE_MY || $what == MyManager::INFO_TYPE_STUDIO) {
             try {
                 $this->mymanager->publish($what);

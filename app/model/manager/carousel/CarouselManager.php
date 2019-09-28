@@ -89,8 +89,8 @@ class CarouselManager {
     public function addImage(string $name, string $description, FileEntry $image) {
         $this->database->beginTransaction();
         $result = [];
-        $destFileName = "";
-        $insertedID = -1;
+        $destFileName = null;
+        $insertedID = null;
 
         $result[self::COLUMN_IMAGE_NAME] = $name;
         $result[self::COLUMN_IMAGE_DESCRIPTION] = $description;
@@ -108,7 +108,7 @@ class CarouselManager {
 
         $fileHash = $this->filemanager->hashFile($destFileName);
 
-//         2. Vlož záznam do databáze
+        // 2. Vlož záznam do databáze
         try {
             $insertedID = $this->database->insert(self::TABLE_NAME, [
                 'name' => $name,

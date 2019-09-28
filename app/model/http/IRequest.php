@@ -3,6 +3,8 @@
 namespace app\model\http;
 
 
+use Exception;
+
 interface IRequest {
 
     const
@@ -54,11 +56,14 @@ interface IRequest {
     function getFiles();
 
     /**
-     * Vrátí pole parametrů
+     * Vrátí parametr na určitém indexu.
+     * Pokud takový parametr neexistuje, vyhodí vyjímku.
      *
-     * @return array Pole naparsovaných parametrů z adresy
+     * @param int $index Index parametru
+     * @return mixed Obsah na indexu parametru
+     * @throws BadQueryStringException Pokud index parametr neukazuje na žádný parametr
      */
-    function getParams();
+    function getParam(int $index);
 
     /**
      * Zkontroluje, zda-li požadavek obsahuje nějaké parametry

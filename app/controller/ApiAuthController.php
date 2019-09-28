@@ -4,6 +4,7 @@
 namespace app\controller;
 
 
+use app\model\http\BadQueryStringException;
 use app\model\http\IResponse;
 use app\model\manager\user\UserDataException;
 use app\model\manager\user\UserException;
@@ -69,7 +70,10 @@ class ApiAuthController extends BaseApiController {
     }
 
     public function check_codeGETAction(IRequest $request, IResponse $response) {
-        $checkCode = $request->getParams()[0];
+        $checkCode = $request->getParam(0);
+        if (empty($checkCode)) {
+            throw new BadQueryStringException("Typ informace není zadaný, nebo nemá správný formát!");
+        }
 
         try {
             $this->usermanager->checkCode($checkCode);

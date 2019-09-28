@@ -4,6 +4,7 @@
 namespace app\controller\account;
 
 
+use app\controller\Constants;
 use app\middleware\AuthMiddleware;
 use app\model\http\IResponse;
 use app\model\manager\user\UserDataException;
@@ -108,7 +109,7 @@ class ApiAccountPersonalController extends BaseAccountController {
 
         try {
             $this->usermanager->disable($id, $password);
-            $this->setResponseMessage("Účet byl úspěšně zručený.");
+            $this->setResponseMessage("Účet byl úspěšně zrušený.");
         } catch (UserException | UserDataException $ex) {
             $this->logger->error($ex->getMessage());
             $response->setCode(StatusCodes::NOT_FOUND);

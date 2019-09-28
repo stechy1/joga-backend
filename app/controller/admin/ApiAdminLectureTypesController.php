@@ -4,6 +4,7 @@
 namespace app\controller\admin;
 
 
+use app\model\http\BadQueryStringException;
 use app\model\http\IResponse;
 use app\model\manager\lecture_types\LectureTypesManager;
 use app\model\http\IRequest;
@@ -36,10 +37,13 @@ class ApiAdminLectureTypesController extends AdminBaseController {
     }
 
     public function idGETAction(IRequest $request, IResponse $response) {
-        $lectureId = +$request->getParams()[0];
+        $lectureTypeId = $request->getParam(0);
+        if (!is_numeric($lectureTypeId)) {
+            throw new BadQueryStringException("ID typu lekce není zadané, nebo nemá správný formát!");
+        }
 
         try {
-            $lectureType = $this->lecturetypesmanager->byId($lectureId);
+            $lectureType = $this->lecturetypesmanager->byId(+$lectureTypeId);
             $response->addData(self::LECTURE_TYPE, $lectureType);
         } catch (Exception $ex) {
             $this->logger->error($ex->getMessage());
@@ -83,11 +87,14 @@ class ApiAdminLectureTypesController extends AdminBaseController {
     }
 
     public function defaultDELETEAction(IRequest $request, IResponse $response) {
-        $lectureTypeId = +$request->getParams()[0];
+        $lectureTypeId = $request->getParam(0);
+        if (!is_numeric($lectureTypeId)) {
+            throw new BadQueryStringException("ID typu lekce není zadané, nebo nemá správný formát!");
+        }
 
         try {
-            $lecture = $this->lecturetypesmanager->byId($lectureTypeId);
-            $this->lecturetypesmanager->delete($lectureTypeId);
+            $lecture = $this->lecturetypesmanager->byId(+$lectureTypeId);
+            $this->lecturetypesmanager->delete(+$lectureTypeId);
 
             $response->addData(self::LECTURE_TYPE, $lecture);
         } catch (Exception $ex) {

@@ -5,10 +5,12 @@ namespace app\model\manager\lectures;
 
 
 use app\model\database\Database;
+use app\model\http\BadQueryStringException;
 use DateInterval;
 use DateTime;
 use Exception;
 use Logger;
+use PDOException;
 
 /**
  * Class LecturesManager
@@ -75,14 +77,33 @@ class LecturesManager {
     }
 
     public function insert(int $trainer, int $timeStart, int $timeEnd, int $maxPersons, string $place, int $type) {
-        return $this->database->insert(self::TABLE_NAME, [
-            LecturesManager::COLUMN_TRAINER => $trainer,
-            LecturesManager::COLUMN_TIME_START => $timeStart,
-            LecturesManager::COLUMN_TIME_END => $timeEnd,
-            LecturesManager::COLUMN_MAX_PERSONS => $maxPersons,
-            LecturesManager::COLUMN_PLACE => $place,
-            LecturesManager::COLUMN_TYPE => $type
-        ]);
+        $today = new DateTime();
+        if ($timeStart < $today->getTimestamp()) {
+            throw new BadQueryStringException("Nelze založit lekci v minulosti!");
+        }
+        if ($timeEnd < $timeStart) {
+            throw new BadQueryStringException("Konec lekce nemůže být dříve, než začátek!");
+        }
+        if ($timeStart > $timeEnd) {
+            throw new BadQueryStringException("Začátek lekce nemůže být později, než konec!");
+        }
+
+        try {
+            return $this->database->insert(self::TABLE_NAME,
+                [
+                    LecturesManager::COLUMN_TRAINER => $trainer,
+                    LecturesManager::COLUMN_TIME_START => $timeStart,
+                    LecturesManager::COLUMN_TIME_END => $timeEnd,
+                    LecturesManager::COLUMN_MAX_PERSONS => $maxPersons,
+                    LecturesManager::COLUMN_PLACE => $place,
+                    LecturesManager::COLUMN_TYPE => $type
+                ]);
+        } catch (PDOException $ex) {
+            $this->logger->fatal($ex->getMessage());
+            $this->logger->fatal($ex->getCode());
+            $this->logger->debug($ex->getTraceAsString());
+            throw new LectureDataException("Nepodařilo se založit novou lekci!");
+        }
     }
 
     public function lectureNameByType(int $lectureType) {
@@ -115,7 +136,7 @@ class LecturesManager {
             [$lectureId]);
 
         if ($fromDb == null) {
-            throw new LectureException("Lekce s Id: ${$lectureId} nebyla nalezena!");
+            throw new LectureException("Lekce s Id: " . $lectureId . " nebyla nalezena!");
         }
 
         return $fromDb;

@@ -71,9 +71,14 @@ class Request implements IRequest {
         return $this->files;
     }
 
-    function getParams() {
-        return $this->params;
+    function getParam(int $index) {
+        if (!isset($this->params[$index])) {
+            throw new BadQueryStringException("Parametr neexistuje!");
+        }
+
+        return $this->params[$index];
     }
+
 
     function hasParams($minCount = 0) {
         return sizeof($this->params) - 1 >= $minCount;
@@ -89,6 +94,7 @@ class Request implements IRequest {
 
     function spliceParams() {
         $this->params = array_slice($this->params, 1);
+        $this->logger->trace("Param array was spliced: " . $this->__toString());
     }
 
     public function __toString() {

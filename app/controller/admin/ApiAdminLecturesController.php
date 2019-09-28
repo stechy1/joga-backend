@@ -4,12 +4,13 @@
 namespace app\controller\admin;
 
 
+use app\controller\Constants;
+use app\model\http\BadQueryStringException;
 use app\model\http\IResponse;
 use app\model\manager\lectures\LecturesManager;
 use app\model\manager\user\UserManager;
 use app\model\http\IRequest;
 use app\model\util\StatusCodes;
-use DateTime;
 use Exception;
 use Logger;
 
@@ -22,7 +23,6 @@ use Logger;
 class ApiAdminLecturesController extends AdminBaseController {
 
     const TRAINERS = "trainers";
-    const LECTURE_TYPES = "lectureTypes";
     const LECTURE = "lecture";
     const VALID = "valid";
 
@@ -45,9 +45,12 @@ class ApiAdminLecturesController extends AdminBaseController {
     }
 
     public function defaultGETAction(IRequest $request, IResponse $response) {
-        $timestamp = +$request->getParams()[0];
+        $lectureId = $request->getParam(0);
+        if (!is_numeric($lectureId)) {
+            throw new BadQueryStringException("ID lekce není zadané, nebo nemá správný formát!");
+        }
 
-        $lectures = $this->lecturesmanager->all($timestamp, true);
+        $lectures = $this->lecturesmanager->all($lectureId, true);
         $response->addData('lectures', $lectures);
     }
 
@@ -57,10 +60,13 @@ class ApiAdminLecturesController extends AdminBaseController {
     }
 
     public function idGETAction(IRequest $request, IResponse $response) {
-        $lectureId = +$request->getParams()[0];
+        $lectureId = $request->getParam(0);
+        if (!is_numeric($lectureId)) {
+            throw new BadQueryStringException("ID lekce není zadané, nebo nemá správný formát!");
+        }
 
         try {
-            $lecture = $this->lecturesmanager->byId($lectureId);
+            $lecture = $this->lecturesmanager->byId(+$lectureId);
             $response->addData(self::LECTURE, $lecture);
         } catch (Exception $ex) {
             $this->logger->error($ex->getMessage());
@@ -71,9 +77,9 @@ class ApiAdminLecturesController extends AdminBaseController {
 
     public function time_validityGETAction(IRequest $request, IResponse $response) {
         $valid = false;
-        $when = $request->getParams()[0];
-        $dateTime = +$request->getParams()[1];
-        $lectureId = isset($request->getParams()[2]) ? +$request->getParams()[2] : -1;
+        $when = +$request->getParam(0);
+        $dateTime = +$request->getParam(1);
+        $lectureId = $request->hasParams(3) ? +$request->getParam(2) : -1; // isset($request->getParams()[2]) ? +$request->getParams()[2] : -1;
 
         try {
             switch ($when) {
@@ -111,8 +117,11 @@ class ApiAdminLecturesController extends AdminBaseController {
             $lecture = $this->lecturesmanager->byId($lectureId);
 
             $response->addData(self::LECTURE, $lecture);
+            $response->setCode(StatusCodes::CREATED);
         } catch (Exception $ex) {
-            $this->logger->error("Nepodařilo se založit novou lekci!", $ex);
+            $this->logger->error($ex->getMessage());
+            $this->logger->debug($ex->getTraceAsString());
+            $this->setResponseMessage($ex->getMessage(), Constants::RESPONSE_MESSAGE_TYPE_ERROR);
             $response->setCode(StatusCodes::NOT_FOUND);
         }
     }
@@ -133,12 +142,13 @@ class ApiAdminLecturesController extends AdminBaseController {
             $response->addData(self::LECTURE, $lecture);
         } catch (Exception $ex) {
             $this->logger->error("Nepodařilo se upravit lekci s ID: " . $lectureId . "!", $ex);
+            $this->setResponseMessage($ex->getMessage(), Constants::RESPONSE_MESSAGE_TYPE_ERROR);
             $response->setCode(StatusCodes::NOT_FOUND);
         }
     }
 
     public function defaultDELETEAction(IRequest $request, IResponse $response) {
-        $lectureId = +$request->getParams()[0];
+        $lectureId = +$request->getParam(0);
 
         try {
             $lecture = $this->lecturesmanager->byId($lectureId);
@@ -146,6 +156,7 @@ class ApiAdminLecturesController extends AdminBaseController {
             $response->addData(self::LECTURE, $lecture);
         } catch (Exception $ex) {
             $this->logger->error("Nepodařilo se smazat lekci s ID: " . $lectureId . "!", $ex);
+            $this->setResponseMessage($ex->getMessage(), Constants::RESPONSE_MESSAGE_TYPE_ERROR);
             $response->setCode(StatusCodes::NOT_FOUND);
         }
     }
