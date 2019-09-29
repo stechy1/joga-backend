@@ -77,9 +77,19 @@ class ApiAdminLecturesController extends AdminBaseController {
 
     public function time_validityGETAction(IRequest $request, IResponse $response) {
         $valid = false;
-        $when = +$request->getParam(0);
+        $when = $request->getParam(0);
         $dateTime = +$request->getParam(1);
-        $lectureId = $request->hasParams(3) ? +$request->getParam(2) : -1; // isset($request->getParams()[2]) ? +$request->getParams()[2] : -1;
+        $lectureId = -1;
+
+        if ($request->hasParams(2)) {
+            $this->logger->trace("ID je k dispozici.");
+            $rawId = $request->getParam(2);
+            if (!empty($rawId) && is_numeric($rawId)) {
+                $lectureId = $rawId;
+            } else {
+                throw new BadQueryStringException("ID lekce nemá validní formát!");
+            }
+        }
 
         try {
             switch ($when) {

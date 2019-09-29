@@ -87,6 +87,10 @@ class CarouselManager {
      * @throws FileManipulationException Pokud se nepodaří přesunout soubor na své místo
      */
     public function addImage(string $name, string $description, FileEntry $image) {
+        if ($image->hasError()) {
+            throw new ImageUploadException($image->getErrorMessage());
+        }
+
         $this->database->beginTransaction();
         $result = [];
         $destFileName = null;
@@ -127,7 +131,7 @@ class CarouselManager {
             throw new ImageUploadException("Záznam o obrázku se nepodařilo vložit do databáze");
         }
 
-        $newFileName = "";
+        $newFileName = null;
         // 3. Přejmenuj název souboru ve veřejné složce za hash
         try {
             $newFileName = $this->filemanager->rename($destFileName, $fileHash);
@@ -167,10 +171,6 @@ class CarouselManager {
         try {
             $this->database->beginTransaction();
             $imageRecord = $this->byId($id);
-            if ($imageRecord == null) {
-                $this->logger->error("Obrázek ke smazání s ID: " . $id . " nebyl nalezen.");
-                throw new ImageNotFoundException("Obrázek nebyl nalezen");
-            }
 
             $deletedRows = $this->database->delete(self::TABLE_NAME, 'WHERE id = ?', [$id]);
             if ($deletedRows == 0) {
@@ -205,7 +205,12 @@ class CarouselManager {
     public function updateImage(string $imageId, string $name, string $description, int $enabled, int $viewOrder) {
         $updatedRows = $this->database->update(
             self::TABLE_NAME,
-            [self::COLUMN_IMAGE_NAME => $name, self::COLUMN_IMAGE_DESCRIPTION => $description, self::COLUMN_ENABLED => $enabled, self::COLUMN_VIEW_ORDER => $viewOrder],
+            [
+                self::COLUMN_IMAGE_NAME => $name,
+                self::COLUMN_IMAGE_DESCRIPTION => $description,
+                self::COLUMN_ENABLED => $enabled,
+                self::COLUMN_VIEW_ORDER => $viewOrder
+            ],
             "WHERE id = ?",
             [$imageId]
         );

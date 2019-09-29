@@ -3,11 +3,13 @@
 
 namespace app\model\http;
 
-
 use Logger;
 
 class FileEntry {
 
+    /**
+     * @var Logger
+     */
     private $logger;
 
     private $__original;
@@ -17,6 +19,9 @@ class FileEntry {
       $this->logger = Logger::getLogger(__CLASS__);
       $this->__original = $file;
       $this->__pathinfo = pathinfo($this->getTmpName());
+      $this->logger->info("New FileEntry was created.");
+      $this->logger->trace($this->__original);
+      $this->logger->trace($this->__pathinfo);
     }
 
     /**
@@ -57,6 +62,15 @@ class FileEntry {
     }
 
     /**
+     * Zjistí, zda-li je nahraný soubor validní, nebo nastala při zpracování nějaká chyba
+     *
+     * @return bool True, pokud byl soubor úspěšně nahrán, jinak False
+     */
+    public function hasError(): bool {
+        return $this->__original['error'] != 0;
+    }
+
+    /**
      * Vrátí velikost souboru
      *
      * @return int
@@ -65,35 +79,38 @@ class FileEntry {
         return $this->__original['size'];
     }
 
-    private function codeToMessage($code) {
-        switch ($code) {
+    /**
+     * Vrátí zprávu o (ne)úspěšnosti zpracování/nahrání souboru na server
+     *
+     * @return string Zpráva o zpracování/nahrání souboru na server
+     */
+    public function getErrorMessage() {
+        switch ($this->getError()) {
             case UPLOAD_ERR_OK:
-                $message = "There is no error, the file uploaded with success.";
+                $message = "Soubor byl úspěšně nahrán na server.";
                 break;
             case UPLOAD_ERR_INI_SIZE:
-                $message = "The uploaded file exceeds the upload_max_filesize directive in php.ini";
-                break;
             case UPLOAD_ERR_FORM_SIZE:
-                $message = "The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form";
+                $message = "Nahrávaný soubor přesahuje maximální povolenou velikost!";
                 break;
             case UPLOAD_ERR_PARTIAL:
-                $message = "The uploaded file was only partially uploaded";
+                $message = "Soubor byl nahraný pouze částečně!";
                 break;
             case UPLOAD_ERR_NO_FILE:
-                $message = "No file was uploaded";
+                $message = "Žádný soubor nebyl nahrán!";
                 break;
             case UPLOAD_ERR_NO_TMP_DIR:
-                $message = "Missing a temporary folder";
+                $message = "Chybí složka temp!";
                 break;
             case UPLOAD_ERR_CANT_WRITE:
-                $message = "Failed to write file to disk";
+                $message = "Selhal zápis souboru na disk!";
                 break;
             case UPLOAD_ERR_EXTENSION:
-                $message = "File upload stopped by extension";
+                $message = "Nahrání souboru zrušil uživatel!";
                 break;
 
             default:
-                $message = "Unknown upload error";
+                $message = "Nespecifikovaná chyba!";
                 break;
         }
         return $message;

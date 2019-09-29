@@ -9,6 +9,7 @@ use app\model\http\BadQueryStringException;
 use DateInterval;
 use DateTime;
 use Exception;
+use InvalidArgumentException;
 use Logger;
 use PDOException;
 
@@ -46,20 +47,39 @@ class LecturesManager {
         $this->logger = Logger::getLogger(__CLASS__);
     }
 
-    public function all(int $monthTimestamp, bool $showHidden = false) {
-        $this->logger->trace($monthTimestamp);
+    public function all(int $timestamp, string $calendarViewType, bool $showHidden = false) {
+        $this->logger->trace($timestamp);
+        $this->logger->trace("Getting all lectures for: {$calendarViewType}");
 
-        $firstDay = new DateTime();
-        $firstDay->setTimestamp($monthTimestamp);
-        $firstDay->setTime(0, 0, 0);
-        $firstDay->modify("first day of this month");
-        $this->logger->trace($firstDay);
+        $startTime = new DateTime();
+        $startTime->setTimestamp($timestamp);
+        $startTime->setTime(0, 0, 0);
 
-        $lastDay = new DateTime();
-        $lastDay->setTimestamp($monthTimestamp);
-        $lastDay->setTime(23, 23, 59);
-        $lastDay->modify("last day of this month");
-        $this->logger->trace($lastDay);
+//        $startTime->modify("first day of this month");
+//        $this->logger->trace($startTime);
+
+        $endTime = new DateTime();
+        $endTime->setTimestamp($timestamp);
+        $endTime->setTime(23, 23, 59);
+//        $endTime->modify("last day of this month");
+//        $this->logger->trace($endTime);
+
+        switch ($calendarViewType) {
+            case "month":
+                $startTime->modify("first day of this month");
+                $endTime->modify("last day of this month");
+                break;
+            case "week":
+                $startTime->modify("first day of this week");
+                $endTime->modify("last day of this week");
+                break;
+            case "agenda":
+
+                break;
+            default:
+                throw new InvalidArgumentException("Neznámý view typ!");
+        }
+
 
         return $this->database->queryAll(
             "SELECT lectures.id AS lecture_id, time_start, time_end, max_persons, place, published, type,
@@ -73,7 +93,7 @@ class LecturesManager {
                     WHERE time_start BETWEEN ? AND ? 
                     " . (!$showHidden ? "AND published = 1" : "") . "
                     GROUP BY lectures.id, time_start, time_end, max_persons, place, published, trainers.id, trainers.name, lecture_type.name",
-            [$firstDay->getTimestamp(), $lastDay->getTimestamp()]);
+            [$startTime->getTimestamp(), $endTime->getTimestamp()]);
     }
 
     public function insert(int $trainer, int $timeStart, int $timeEnd, int $maxPersons, string $place, int $type) {

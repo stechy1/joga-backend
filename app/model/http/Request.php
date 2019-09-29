@@ -71,9 +71,13 @@ class Request implements IRequest {
         return $this->files;
     }
 
-    function getParam(int $index) {
+    function getParam(int $index, bool $mandatory = true) {
         if (!isset($this->params[$index])) {
-            throw new BadQueryStringException("Parametr neexistuje!");
+            if ($mandatory) {
+                throw new BadQueryStringException("Parametr neexistuje!");
+            }
+
+            return null;
         }
 
         return $this->params[$index];
