@@ -58,16 +58,16 @@ class ApiGeneralController extends BaseApiController {
     }
 
     public function lecturesGETAction(IRequest $request, IResponse $response) {
-        $timestamp = $request->getParam(0);
-        if (!is_string($timestamp)) {
-            throw new BadQueryStringException("Timestamp není zadaný, nebo nemá správný formát!");
-        }
-        $calendarViewType = $request->getParam(1);
+        $calendarViewType = $request->getParam(0);
         if (!is_string($calendarViewType)) {
             throw new BadQueryStringException("View typ není zadaný, nebo nemá správný formát!");
         }
         if ($calendarViewType !== "month" && $calendarViewType !== "week" && $calendarViewType !== "agenda") {
             throw new BadQueryStringException("Neznámý view typ!");
+        }
+        $timestamp = $request->getParam(1);
+        if (!is_string($timestamp)) {
+            throw new BadQueryStringException("Timestamp není zadaný, nebo nemá správný formát!");
         }
 
         $lectures = $this->lecturesmanager->all(+$timestamp, $calendarViewType);
