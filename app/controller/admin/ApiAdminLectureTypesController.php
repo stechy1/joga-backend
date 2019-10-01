@@ -56,9 +56,10 @@ class ApiAdminLectureTypesController extends AdminBaseController {
         $name = $request->get(LectureTypesManager::COLUMN_NAME);
         $description = $request->get(LectureTypesManager::COLUMN_DESCRIPTION);
         $price = $request->get(LectureTypesManager::COLUMN_PRICE);
+        $image = $request->getFile(LectureTypesManager::VIRAUAL_COLUMN_IMAGE);
 
         try {
-            $lectureTypeId = $this->lecturetypesmanager->insert($name, $description, $price);
+            $lectureTypeId = $this->lecturetypesmanager->insert($name, $description, $price, $image);
             $lectureType = $this->lecturetypesmanager->byId($lectureTypeId);
 
             $response->addData(self::LECTURE_TYPE, $lectureType);

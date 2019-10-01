@@ -12,7 +12,7 @@ use Logger;
  */
 class FileManager {
 
-    const FOLDER_UPLOADS = "uploads", FOLDER_IMAGE = "image", FOLDER_TMP = "tmp", FOLDER_INFO = "info";
+    const FOLDER_UPLOADS = "uploads", FOLDER_IMAGE = "image", FOLDER_LECTURES = "lectures", FOLDER_TMP = "tmp", FOLDER_INFO = "info";
 
     private $logger;
 
@@ -33,6 +33,7 @@ class FileManager {
         $this->folders[self::FOLDER_UPLOADS] = $this->folderRoot . "public/uploads/";
 //        $this->folders[self::FOLDER_CATEGORY] = $this->folders['uploads'] . "category/";
         $this->folders[self::FOLDER_IMAGE] = $this->folders[self::FOLDER_UPLOADS] . "image/";
+        $this->folders[self::FOLDER_LECTURES] = $this->folders[self::FOLDER_UPLOADS] . "lectures/";
         $this->folders[self::FOLDER_TMP] = $this->folders[self::FOLDER_UPLOADS] . "tmp/";
         $this->folders[self::FOLDER_INFO] = $this->folders[self::FOLDER_UPLOADS] . "info/";
 //        $this->folders[self::FOLDER_FORUM_IMAGE] = $this->folders['image'] . "/forum";

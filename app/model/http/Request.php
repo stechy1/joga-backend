@@ -51,20 +51,33 @@ class Request implements IRequest {
         return $this->action;
     }
 
-    function get($key = null, $default = null) {
+    function get(string $key = null, bool $mandatory = true, $default = null) {
         if (func_num_args() === 0) {
             return $this->data;
 
-        } elseif (isset($this->data[$key])) {
-            return $this->data[$key];
+        }
 
-        } else {
+        if (!isset($this->data[$key])) {
+            if ($mandatory) {
+                throw new BadQueryStringException("Parametr '" . $key . "' nebyl nalezen!");
+            }
+
             return $default;
         }
+
+        return $this->data[$key];
     }
 
-    function getFile($key): FileEntry {
-        return isset($this->files[$key]) ? new FileEntry($this->files[$key]) : null;
+    function getFile(string $key, bool $mandatory = true): FileEntry {
+        if (!isset($this->files[$key])) {
+            if ($mandatory) {
+                throw new BadQueryStringException("Soubor nebyl přiložen!");
+            }
+
+            return null;
+        }
+
+        return new FileEntry($this->files[$key]);
     }
 
     function getFiles() {
@@ -74,7 +87,7 @@ class Request implements IRequest {
     function getParam(int $index, bool $mandatory = true) {
         if (!isset($this->params[$index])) {
             if ($mandatory) {
-                throw new BadQueryStringException("Parametr neexistuje!");
+                throw new BadQueryStringException("Parametr " . $index . " neexistuje!");
             }
 
             return null;

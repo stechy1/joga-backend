@@ -33,20 +33,24 @@ interface IRequest {
     /**
      * Vrátí hodnotu uloženou v postu na daném klíči. Pokud hodnota neexistuje, vrátí výchozí hodnotu
      *
-     * @param null $key Klíč hledané hodnoty
+     * @param string $key Klíč hledané hodnoty
+     * @param bool $mandatory True, pokud je parametr povinný, jinak false
      * @param null $default Výchozí hodnota, pokud není v postu
      * @return mixed Hodnotu z postu nebo výchozí hodnotu
+     * @throws BadQueryStringException Pokud je parametr povinný a není přítomný
      */
-    function get($key = null, $default = null);
+    function get(string $key = null, bool $mandatory = true, $default = null);
 
     /**
      * Vrátí nahraný soubor
      *
      * @param $key string Klíč, pod kterým se má soubor nacházet
      *
+     * @param bool $mandatory True, pokud je parametr povinný
      * @return FileEntry|null
+     * @throws BadQueryStringException Pokud je parametr povinný a není přítomný
      */
-    function getFile($key): FileEntry;
+    function getFile(string $key, bool $mandatory = true): FileEntry;
 
     /**
      * Vrátí pole nahraných souborů
