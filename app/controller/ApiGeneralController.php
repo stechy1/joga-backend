@@ -8,11 +8,14 @@ use app\model\http\BadQueryStringException;
 use app\model\http\IRequest;
 use app\model\http\IResponse;
 use app\model\manager\carousel\CarouselManager;
+use app\model\manager\email\EmailException;
+use app\model\manager\email\EmailManager;
 use app\model\manager\lecture_types\LectureTypeException;
 use app\model\manager\lecture_types\LectureTypesManager;
 use app\model\manager\lectures\LectureException;
 use app\model\manager\lectures\LecturesManager;
 use app\model\util\StatusCodes;
+use Exception;
 use Logger;
 
 /**
@@ -21,6 +24,7 @@ use Logger;
  * @Inject LectureTypesManager
  * @Inject LecturesManager
  * @Inject CarouselManager
+ * @Inject EmailManager
  * @package app\controller
  */
 class ApiGeneralController extends BaseApiController {
@@ -29,6 +33,11 @@ class ApiGeneralController extends BaseApiController {
     const LECTURES = "lectures";
     const LECTURE_TYPE = "lecture_type";
     const CAROUSEL = "carousel";
+
+    const EMAIL_CONTENT = "message";
+    const EMAIL_NAME = "name";
+    const EMAIL_FROM_EMAIL = "email";
+    const EMAIL_RECAPTCHA = "recaptcha";
 
     /**
      * @var Logger
@@ -46,6 +55,10 @@ class ApiGeneralController extends BaseApiController {
      * @var CarouselManager
      */
     private $carouselmanager;
+    /**
+     * @var EmailManager
+     */
+    private $emailmanager;
 
     public function __construct() {
         parent::__construct();
@@ -94,4 +107,19 @@ class ApiGeneralController extends BaseApiController {
         $response->addData(self::CAROUSEL, $images);
     }
 
+    public function emailPOSTAction(IRequest $request, IResponse $response) {
+        $message = $request->get(self::EMAIL_CONTENT);
+        $name = $request->get(self::EMAIL_NAME);
+        $emailFrom = $request->get(self::EMAIL_FROM_EMAIL);
+        $recaptcha = $response->get(self::EMAIL_RECAPTCHA);
+
+        
+
+        try {
+            $this->emailmanager->sendEmailFromContactForm($message, $name, $emailFrom);
+        } catch (Exception $ex) {
+            $response->setCode(StatusCodes::BAD_REQUEST);
+            $this->setResponseMessage("E-mail se nepodařilo odeslat!", Constants::RESPONSE_MESSAGE_TYPE_ERROR);
+        }
+    }
 }

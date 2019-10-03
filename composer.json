@@ -1,16 +1,12 @@
 {
-  "name": "czfx/czfx",
-  "description": "Semestrální přáce pro předmět KIV/WEB",
+  "name": "StudioOM",
+  "description": "Portfolio webu pro Jogu",
   "minimum-stability": "dev",
   "license": "proprietary",
   "authors": [
     {
       "name": "Petr Štechmüller",
       "email": "petr.stechmuller@seznam.cz"
-    },
-    {
-      "name": "Petr Kraus",
-      "email": "a.b@c.cz"
     }
   ],
   "require": {
@@ -20,7 +16,8 @@
     "ext-openssl": "*",
     "ext-json": "*",
     "firebase/php-jwt": "dev-master",
-    "ralouphie/getallheaders": "dev-master"
+    "ralouphie/getallheaders": "dev-master",
+    "phpmailer/phpmailer": "dev-master"
   },
   "autoload": {
     "classmap": [

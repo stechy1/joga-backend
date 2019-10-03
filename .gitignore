@@ -85,3 +85,4 @@ loging.log
 # You may choose to ignore a library lock file http://getcomposer.org/doc/02-libraries.md#lock-file
 # composer.lock
 app/config/hidden_config.php
+app/config/email_config.php

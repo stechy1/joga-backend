@@ -1,0 +1,9 @@
+<?php
+
+return array(
+    "host" => "smtp.gmail.com",
+    "enable_smtp_auth" => true,
+    "username" => "",
+    "password" => "",
+    "port" => "465",
+);
