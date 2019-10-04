@@ -11,6 +11,7 @@ use app\model\http\IRequest;
 use app\model\http\IResponse;
 use app\model\manager\lectures\LectureException;
 use app\model\manager\lectures\LecturesManager;
+use app\model\manager\reservations\LectureReservationException;
 use app\model\manager\reservations\LectureReservationsManager;
 use app\model\util\StatusCodes;
 use Logger;
@@ -74,7 +75,7 @@ class ApiAccountLecturesController extends BaseAccountController {
         try {
             $this->lecturereservationsmanager->reserve($clientId, $lectureId);
 
-        } catch (LectureException $ex) {
+        } catch (LectureException|LectureReservationException $ex) {
             $this->logger->error($ex->getMessage());
             $response->setCode(StatusCodes::NOT_FOUND);
             $this->setResponseMessage($ex->getMessage(), Constants::RESPONSE_MESSAGE_TYPE_ERROR);
@@ -89,7 +90,7 @@ class ApiAccountLecturesController extends BaseAccountController {
         try {
             $this->lecturereservationsmanager->cancel($clientId, $lectureId);
 
-        } catch (LectureException $ex) {
+        } catch (LectureReservationException $ex) {
             $this->logger->error($ex->getMessage());
             $response->setCode(StatusCodes::NOT_FOUND);
             $this->setResponseMessage($ex->getMessage(), Constants::RESPONSE_MESSAGE_TYPE_ERROR);

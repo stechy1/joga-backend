@@ -59,7 +59,7 @@ class LectureReservationsManager {
 
         $diff = $start->diff($time);
 
-        if ($diff->y == 0 && $diff->m == 0 && $diff->days == 0 && $diff->h < 2) {
+        if ($diff->invert == 0 || $diff->y == 0 && $diff->m == 0 && $diff->days == 0 && $diff->h < 2) {
             throw new LectureReservationException("Na lekci se již nelze rezervovat. Je příliš pozdě!");
         }
 
