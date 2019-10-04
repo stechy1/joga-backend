@@ -92,6 +92,24 @@ class LecturesManager {
             [$clientId, $startTime->getTimestamp(), $endTime->getTimestamp()]);
     }
 
+    public function clientLectures(int $clientId) {
+        return $this->database->queryAll(
+            "SELECT lectures.id AS lecture_id, time_start, time_end, max_persons, place, published, type,
+                           trainers.id AS trainer_id, trainers.name AS trainer_name,
+                           lecture_type.name AS lecture_name,
+                           COUNT(clients.client) AS reserved_clients,
+                           COUNT(reserved.client) AS assigned
+                    FROM lecture_reservations
+                             LEFT JOIN lectures ON lectures.id = lecture
+                             LEFT JOIN users trainers ON trainers.id = lectures.trainer
+                             LEFT JOIN lecture_type ON lecture_type.id = lectures.type
+                             LEFT JOIN lecture_reservations clients ON clients.lecture = lectures.id
+                             LEFT JOIN lecture_reservations reserved ON clients.client = ?
+                    WHERE lecture_reservations.client = ?
+                    GROUP BY lectures.id, time_start, time_end, max_persons, place, published, trainers.id, trainers.name, lecture_type.name",
+            [$clientId, $clientId]);
+    }
+
     public function insert(int $trainer, int $timeStart, int $timeEnd, int $maxPersons, string $place, int $type) {
         $today = new DateTime();
         if ($timeStart < $today->getTimestamp()) {

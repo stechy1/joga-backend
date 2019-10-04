@@ -4,15 +4,14 @@
 namespace app\controller;
 
 
+use app\middleware\AuthMiddleware;
 use app\model\http\BadQueryStringException;
 use app\model\http\IRequest;
 use app\model\http\IResponse;
 use app\model\manager\carousel\CarouselManager;
-use app\model\manager\email\EmailException;
 use app\model\manager\email\EmailManager;
 use app\model\manager\lecture_types\LectureTypeException;
 use app\model\manager\lecture_types\LectureTypesManager;
-use app\model\manager\lectures\LectureException;
 use app\model\manager\lectures\LecturesManager;
 use app\model\util\StatusCodes;
 use Exception;
@@ -29,6 +28,7 @@ use Logger;
  */
 class ApiGeneralController extends BaseApiController {
 
+    const LECTURES = "lectures";
     const LECTURE_TYPES = "lectureTypes";
     const LECTURE_TYPE = "lecture_type";
     const CAROUSEL = "carousel";
@@ -69,7 +69,29 @@ class ApiGeneralController extends BaseApiController {
         $response->addData(self::LECTURE_TYPES, $lectureTypes);
     }
 
+    public function defaultGETAction(IRequest $request, IResponse $response) {
+        $calendarViewType = $request->getParam(0);
+        if (!is_string($calendarViewType)) {
+            throw new BadQueryStringException("View typ není zadaný, nebo nemá správný formát!");
+        }
+        if ($calendarViewType !== "month" && $calendarViewType !== "week" && $calendarViewType !== "agenda") {
+            throw new BadQueryStringException("Neznámý view typ [" . $calendarViewType . "]!");
+        }
+        $timestamp = $request->getParam(1);
+        if (!is_string($timestamp)) {
+            throw new BadQueryStringException("Timestamp není zadaný, nebo nemá správný formát!");
+        }
+        $id = -1;
+        $jwt = $response->getFlowData(AuthMiddleware::JWT_DATA);
+        $this->logger->info($jwt);
+        if (isset($jwt)) {
+            $id = +$jwt->id;
+        }
 
+        $lectures = $this->lecturesmanager->all(+$timestamp, $calendarViewType, false, $id);
+
+        $response->addData(self::LECTURES, $lectures);
+    }
 
     public function lecture_typeGETAction(IRequest $request, IResponse $response) {
         $lectureTypeId = $request->getParam(0);

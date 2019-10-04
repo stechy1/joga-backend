@@ -6,7 +6,6 @@ namespace app\controller\account;
 
 use app\controller\Constants;
 use app\middleware\AuthMiddleware;
-use app\model\http\BadQueryStringException;
 use app\model\http\IRequest;
 use app\model\http\IResponse;
 use app\model\manager\lectures\LectureException;
@@ -44,26 +43,11 @@ class ApiAccountLecturesController extends BaseAccountController {
         $this->logger = Logger::getLogger(__CLASS__);
     }
 
-    public function defaultGETAction(IRequest $request, IResponse $response) {
-        $calendarViewType = $request->getParam(0);
-        if (!is_string($calendarViewType)) {
-            throw new BadQueryStringException("View typ není zadaný, nebo nemá správný formát!");
-        }
-        if ($calendarViewType !== "month" && $calendarViewType !== "week" && $calendarViewType !== "agenda") {
-            throw new BadQueryStringException("Neznámý view typ!");
-        }
-        $timestamp = $request->getParam(1);
-        if (!is_string($timestamp)) {
-            throw new BadQueryStringException("Timestamp není zadaný, nebo nemá správný formát!");
-        }
-        $id = null;
+    public function my_lecturesGETAction(IRequest $request, IResponse $response) {
         $jwt = $response->getFlowData(AuthMiddleware::JWT_DATA);
-        if (isset($jwt)) {
-            $id = +$jwt->id;
-        }
+        $clientId = +$jwt->id;
 
-        $lectures = $this->lecturesmanager->all(+$timestamp, $calendarViewType, false, $id);
-
+        $lectures = $this->lecturesmanager->clientLectures($clientId);
         $response->addData(self::LECTURES, $lectures);
     }
 
