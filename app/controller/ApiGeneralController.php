@@ -30,7 +30,6 @@ use Logger;
 class ApiGeneralController extends BaseApiController {
 
     const LECTURE_TYPES = "lectureTypes";
-    const LECTURES = "lectures";
     const LECTURE_TYPE = "lecture_type";
     const CAROUSEL = "carousel";
 
@@ -70,22 +69,7 @@ class ApiGeneralController extends BaseApiController {
         $response->addData(self::LECTURE_TYPES, $lectureTypes);
     }
 
-    public function lecturesGETAction(IRequest $request, IResponse $response) {
-        $calendarViewType = $request->getParam(0);
-        if (!is_string($calendarViewType)) {
-            throw new BadQueryStringException("View typ není zadaný, nebo nemá správný formát!");
-        }
-        if ($calendarViewType !== "month" && $calendarViewType !== "week" && $calendarViewType !== "agenda") {
-            throw new BadQueryStringException("Neznámý view typ!");
-        }
-        $timestamp = $request->getParam(1);
-        if (!is_string($timestamp)) {
-            throw new BadQueryStringException("Timestamp není zadaný, nebo nemá správný formát!");
-        }
 
-        $lectures = $this->lecturesmanager->all(+$timestamp, $calendarViewType);
-        $response->addData(self::LECTURES, $lectures);
-    }
 
     public function lecture_typeGETAction(IRequest $request, IResponse $response) {
         $lectureTypeId = $request->getParam(0);

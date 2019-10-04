@@ -47,7 +47,7 @@ class LecturesManager {
         $this->logger = Logger::getLogger(__CLASS__);
     }
 
-    public function all(int $timestamp, string $calendarViewType, bool $showHidden = false) {
+    public function all(int $timestamp, string $calendarViewType, bool $showHidden = false, int $clientId = -1) {
         $this->logger->trace($timestamp);
         $this->logger->trace("Getting all lectures for: {$calendarViewType}");
 
@@ -55,14 +55,9 @@ class LecturesManager {
         $startTime->setTimestamp($timestamp);
         $startTime->setTime(0, 0, 0);
 
-//        $startTime->modify("first day of this month");
-//        $this->logger->trace($startTime);
-
         $endTime = new DateTime();
         $endTime->setTimestamp($timestamp);
         $endTime->setTime(23, 23, 59);
-//        $endTime->modify("last day of this month");
-//        $this->logger->trace($endTime);
 
         switch ($calendarViewType) {
             case "month":
@@ -80,20 +75,21 @@ class LecturesManager {
                 throw new InvalidArgumentException("Neznámý view typ!");
         }
 
-
         return $this->database->queryAll(
             "SELECT lectures.id AS lecture_id, time_start, time_end, max_persons, place, published, type,
                            trainers.id AS trainer_id, trainers.name AS trainer_name,
                            lecture_type.name AS lecture_name,
-                           COUNT(clients.client) AS reserved_clients
+                           COUNT(clients.client) AS reserved_clients,
+                           COUNT(reserved.client) AS assigned
                     FROM lectures
                              LEFT JOIN users trainers ON trainers.id = lectures.trainer
                              LEFT JOIN lecture_type ON lecture_type.id = lectures.type
                              LEFT JOIN lecture_reservations clients ON clients.lecture = lectures.id
+                             LEFT JOIN lecture_reservations reserved ON clients.client = ?
                     WHERE time_start BETWEEN ? AND ? 
                     " . (!$showHidden ? "AND published = 1" : "") . "
                     GROUP BY lectures.id, time_start, time_end, max_persons, place, published, trainers.id, trainers.name, lecture_type.name",
-            [$startTime->getTimestamp(), $endTime->getTimestamp()]);
+            [$clientId, $startTime->getTimestamp(), $endTime->getTimestamp()]);
     }
 
     public function insert(int $trainer, int $timeStart, int $timeEnd, int $maxPersons, string $place, int $type) {
