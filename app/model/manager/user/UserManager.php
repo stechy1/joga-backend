@@ -3,17 +3,20 @@
 namespace app\model\manager\user;
 
 use app\model\database\Database;
+use app\model\manager\email\EmailManager;
 use app\model\manager\jwt\JWTManager;
 use app\model\User;
 use app\model\util\StringUtils;
 use DateTime;
 use Logger;
 use PDOException;
+use PHPMailer\PHPMailer\Exception;
 
 /**
  * Class UserManager - Správce jednotlivých uživatelů
  * @Inject Database
  * @Inject JWTManager
+ * @Inject EmailManager
  * @package app\model\manager
  */
 class UserManager {
@@ -47,6 +50,10 @@ class UserManager {
      * @var JWTManager
      */
     private $jwtmanager;
+    /**
+     * @var EmailManager
+     */
+    private $emailmanager;
 
     /**
      * UserManager constructor.
@@ -216,13 +223,15 @@ class UserManager {
      * @param string $email E-mail nového uživatele
      * @param string $name Jméno nového uživatele
      * @param string $password Heslo nového uživatele
-     * @throws UserException () Pokud se registrace nezdaří
+     * @throws UserException Pokud se registrace nezdaří
+     * @throws Exception Pokud se nepodaří odeslat registrační e-mail s ověřovacím kódem
      */
     public function register(string $email, string $name, string $password) {
         $pass = password_hash($password, PASSWORD_ARGON2I);
         $dateTime = new DateTime();
         $randomString = StringUtils::generateRandomToken(20);
         $checkCode = StringUtils::createHash($pass, $randomString);
+        $this->logger->debug("Check code: " . $checkCode);
         try {
             $this->database->insert('users',
                 [
@@ -237,6 +246,8 @@ class UserManager {
             $this->logger->error($chyba);
             throw new UserException('Uživatel s touto e-mailovou adresou je již zaregistrovaný!');
         }
+
+        $this->emailmanager->sendRegisterEmail($email, $checkCode);
     }
 
     /**

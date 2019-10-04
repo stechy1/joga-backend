@@ -12,7 +12,7 @@ use Logger;
  */
 class FileManager {
 
-    const FOLDER_UPLOADS = "uploads", FOLDER_IMAGE = "image", FOLDER_LECTURES = "lectures", FOLDER_TMP = "tmp", FOLDER_INFO = "info";
+    const FOLDER_UPLOADS = "uploads", FOLDER_IMAGE = "image", FOLDER_LECTURES = "lectures", FOLDER_TMP = "tmp", FOLDER_INFO = "info", FOLDER_DOCUMENTS = "documents";
 
     private $logger;
 
@@ -30,31 +30,24 @@ class FileManager {
     private function init() {
         $this->folderRoot = $_SERVER['DOCUMENT_ROOT'] . '/';
 
+        $this->folders[self::FOLDER_DOCUMENTS] = $this->folderRoot . "/app/documents/";
         $this->folders[self::FOLDER_UPLOADS] = $this->folderRoot . "public/uploads/";
-//        $this->folders[self::FOLDER_CATEGORY] = $this->folders['uploads'] . "category/";
         $this->folders[self::FOLDER_IMAGE] = $this->folders[self::FOLDER_UPLOADS] . "image/";
         $this->folders[self::FOLDER_LECTURES] = $this->folders[self::FOLDER_UPLOADS] . "lectures/";
         $this->folders[self::FOLDER_TMP] = $this->folders[self::FOLDER_UPLOADS] . "tmp/";
         $this->folders[self::FOLDER_INFO] = $this->folders[self::FOLDER_UPLOADS] . "info/";
-//        $this->folders[self::FOLDER_FORUM_IMAGE] = $this->folders['image'] . "/forum";
 
         foreach ($this->folders as $folder) $this->createDirectory($folder);
     }
 
-//    /**
-//     * Vytvoří složku attachments v adresáři s článkem
-//     *
-//     * @param $artFolder string složka s článkem
-//     * @return string Cestu ke složce attachment pro zadaný článek
-//     */
-//    public function getAttachmentsFolder($artFolder) {
-//        $path = $artFolder . "/" . self::FOLDER_ATTACHMENT;
-//        if (!file_exists($path)) mkdir($path);
-//
-//        return $path;
-//    }
-
-    public static function mergePath($path, ...$paths) {
+    /**
+     * Spojí jednotlivé části cesty pomocí separátoru
+     *
+     * @param string $path Výchozí cesta
+     * @param string ...$paths Další části cesty
+     * @return string Výslednou spojenou cestu
+     */
+    public static function mergePath(string $path, ...$paths) {
         return $path . join("/", $paths);
     }
 
@@ -151,36 +144,15 @@ class FileManager {
         return $this->folders[$name];
     }
 
-//    /**
-//     * Vytvoří novou složku pro článek
-//     *
-//     * @param $categoryURL string URL adresa kategorie článku
-//     * @param $articleURL string URL adresa článku
-//     * @return string Cestu k složce s článkem
-//     */
-//    public function createArticleDirectory($categoryURL, $articleURL) {
-//        $path = $this->folders[self::FOLDER_CATEGORY] . $categoryURL . "/" . $articleURL;
-//        $this->createDirectory($path);
-//
-//        return $path;
-//    }
+    /**
+     * Vrátí hash souboru
+     *
+     * @param string $path Cesta k souboru
+     * @return false|string Hash souboru, nebo false v případě, že se hash nepodařilo vytvořit
+     */
     public function hashFile(string $path) {
         return sha1_file($path);
     }
-//    /**
-//     * Přečte soubor a vrátí jeho obsah v textové podobě
-//     *
-//     * @param $categoryURL string URL adresa kategorie článku (složka kategorie, ve které se článek nachází)
-//     * @param $articleURL string URL adresa článku (složka článku, ve které se článek nachází)
-//     * @return string Obsah souboru
-//     * @throws FileManipulationException Pokud článek není nalezen
-//     */
-//    public function getArticleContent($categoryURL, $articleURL) {
-//        $path = $this->folders[self::FOLDER_CATEGORY] . $categoryURL . "/" . $articleURL . "/" . $articleURL . '.markdown';
-//        if (!file_exists($path)) throw new FileManipulationException("Požadovaný soubor nebyl nalezen");
-//
-//        return $this->readFile($path);
-//    }
 
     /**
      * Vytvoří nový soubor a zapíše do něj obsah. Pokud soubor existuje, obsah se přepíše
@@ -199,9 +171,6 @@ class FileManager {
         if (!file_put_contents($path, $text)) {
             throw new FileManipulationException("Obsah se nepodařilo zapsat do souboru!");
         }
-//        $file = fopen($path, "w");
-//        fwrite($file, $text);
-//        fclose($file);
     }
 
     /**
@@ -214,45 +183,14 @@ class FileManager {
         return file_get_contents($path);
     }
 
-//    /**
-//     * Vytvoří dočasnou složku pro uživatele
-//     *
-//     * Pokud složka již existuje, tak smaže její obsah
-//     */
-//    public function createTmpDirectory() {
-//        $tmpDirectory = $this->getTmpDirectory();
-//        if (file_exists($tmpDirectory)) $this->clearTmpDirectory($tmpDirectory); else
-//            $this->createDirectory($tmpDirectory);
-//    }
-//
-//    /**
-//     * @return string Vrátí cestu k dočasné složce uživatele.
-//     */
-//    public function getTmpDirectory() {
-//        $dir = $this->folders[self::FOLDER_TMP] . $_SESSION['user']['id'] . "/";
-//        if (!file_exists($dir)) $this->createDirectory($dir);
-//
-//        return $dir;
-//    }
-
-//    /**
-//     * Metoda vyčistí junk-files z dočasné složky uživatele
-//     *
-//     * @param $tmpDirectory string Cesta k dočasné složce uživatele
-//     */
-//    public function clearTmpDirectory($tmpDirectory = null) {
-//        $tmpDirectory = $tmpDirectory | $this->getTmpDirectory();
-//        $this->recursiveDelete($tmpDirectory);
-//    }
-
     /**
      * Upraví cestu zeké na relativní
      *
-     * @param Path string Statická cesta
+     * @param string Statická cesta
      * @return string Relativná cestu
      */
-    public function getRelativePath($Path) {
-        return str_replace($this->folderRoot, "/", $Path);
+    public function getRelativePath($path) {
+        return str_replace($this->folderRoot, "/", $path);
     }
 
     /**

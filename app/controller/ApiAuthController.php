@@ -12,6 +12,7 @@ use app\model\manager\user\UserManager;
 use app\model\http\IRequest;
 use app\model\util\StatusCodes;
 use Logger;
+use PHPMailer\PHPMailer\Exception;
 
 /**
  * Class ApiAuthController
@@ -47,7 +48,7 @@ class ApiAuthController extends BaseApiController {
         try {
             $this->usermanager->register($email, $name, $password);
             $this->setResponseMessage("Účet byl úspěšně vytvořen. Nyní se můžete přihlásit.");
-        } catch (UserException $ex) {
+        } catch (UserException|Exception $ex) {
             $this->logger->error($ex);
             $response->setCode(StatusCodes::PRECONDITION_FAILED);
             $this->setResponseMessage($ex->getMessage(), Constants::RESPONSE_MESSAGE_TYPE_ERROR);

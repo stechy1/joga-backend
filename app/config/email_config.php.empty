@@ -6,4 +6,5 @@ return array(
     "username" => "",
     "password" => "",
     "port" => "465",
+    "noreply" => "",
 );

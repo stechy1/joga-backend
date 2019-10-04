@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e66035705db6fd75482b49c0654e1fae",
+    "content-hash": "89618e9145012272ff3ae27f4f494616",
     "packages": [
         {
             "name": "apache/log4php",
@@ -88,12 +88,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHPMailer/PHPMailer.git",
-                "reference": "3563788a8620ee003b255eccbc3d75d20ef92d99"
+                "reference": "8fceec772a7ee53fd57573313d775c1caad4acff"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PHPMailer/PHPMailer/zipball/3563788a8620ee003b255eccbc3d75d20ef92d99",
-                "reference": "3563788a8620ee003b255eccbc3d75d20ef92d99",
+                "url": "https://api.github.com/repos/PHPMailer/PHPMailer/zipball/8fceec772a7ee53fd57573313d775c1caad4acff",
+                "reference": "8fceec772a7ee53fd57573313d775c1caad4acff",
                 "shasum": ""
             },
             "require": {
@@ -146,7 +146,7 @@
                 }
             ],
             "description": "PHPMailer is a full-featured email creation and transfer class for PHP",
-            "time": "2019-10-02T11:38:00+00:00"
+            "time": "2019-10-03T11:29:13+00:00"
         },
         {
             "name": "ralouphie/getallheaders",
