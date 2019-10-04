@@ -7,6 +7,8 @@ namespace app\controller\admin;
 use app\controller\Constants;
 use app\model\http\BadQueryStringException;
 use app\model\http\IResponse;
+use app\model\manager\lectures\LectureDataException;
+use app\model\manager\lectures\LectureException;
 use app\model\manager\lectures\LecturesManager;
 use app\model\manager\user\UserManager;
 use app\model\http\IRequest;
@@ -45,12 +47,13 @@ class ApiAdminLecturesController extends AdminBaseController {
     }
 
     public function defaultGETAction(IRequest $request, IResponse $response) {
-        $lectureId = $request->getParam(0);
+        $viewType= $request->getParam(0);
+        $lectureId = $request->getParam(1);
         if (!is_numeric($lectureId)) {
             throw new BadQueryStringException("ID lekce není zadané, nebo nemá správný formát!");
         }
 
-        $lectures = $this->lecturesmanager->all($lectureId, true);
+        $lectures = $this->lecturesmanager->all($lectureId, $viewType,true);
         $response->addData('lectures', $lectures);
     }
 
@@ -82,12 +85,10 @@ class ApiAdminLecturesController extends AdminBaseController {
         $lectureId = -1;
 
         if ($request->hasParams(2)) {
-            $this->logger->trace("ID je k dispozici.");
             $rawId = $request->getParam(2);
             if (!empty($rawId) && is_numeric($rawId)) {
+                $this->logger->trace("ID je k dispozici.");
                 $lectureId = $rawId;
-            } else {
-                throw new BadQueryStringException("ID lekce nemá validní formát!");
             }
         }
 
@@ -154,6 +155,24 @@ class ApiAdminLecturesController extends AdminBaseController {
             $this->logger->error("Nepodařilo se upravit lekci s ID: " . $lectureId . "!", $ex);
             $this->setResponseMessage($ex->getMessage(), Constants::RESPONSE_MESSAGE_TYPE_ERROR);
             $response->setCode(StatusCodes::NOT_FOUND);
+        }
+    }
+
+    public function publich_lecturePATCHAction(IRequest $request, IResponse $response) {
+        $lectureId = $request->getParam(0);
+        if (!is_numeric($lectureId)) {
+            throw new BadQueryStringException("ID lekce není zadané, nebo nemá správný formát!");
+        }
+
+        try {
+            $this->lecturesmanager->publish($lectureId);
+            $lecture = $this->lecturesmanager->byId($lectureId);
+            $response->addData(self::LECTURE, $lecture);
+            $this->setResponseMessage("Lekce byla úspěšně publikována.");
+        } catch (LectureDataException|LectureException $ex) {
+            $this->logger->error($ex->getMessage());
+            $response->setCode(StatusCodes::NOT_FOUND);
+            $this->setResponseMessage($ex->getMessage(), Constants::RESPONSE_MESSAGE_TYPE_ERROR);
         }
     }
 

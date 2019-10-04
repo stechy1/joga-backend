@@ -191,6 +191,14 @@ class LecturesManager {
         }
     }
 
+    public function publish(int $lectureId) {
+        $fromDb = $this->database->update(self::TABLE_NAME, [LecturesManager::COLUMN_PUBLISHED => 1], "WHERE id = ?", [$lectureId]);
+
+        if ($fromDb == 0) {
+            throw new LectureDataException("Lekci se nepodařilo publikovat!");
+        }
+    }
+
     /**
      * Smaže lekci podle Id
      *
