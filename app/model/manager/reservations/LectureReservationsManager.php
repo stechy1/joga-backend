@@ -64,7 +64,7 @@ class LectureReservationsManager {
         }
 
         if ($lecture[LecturesManager::VIRTUAL_COLUMN_RESERVED_CLIENTS] == $lecture[LecturesManager::COLUMN_MAX_PERSONS]) {
-            throw new LectureReservationException("Na lekci je rezervován maximální počet klientů!")
+            throw new LectureReservationException("Na lekci je rezervován maximální počet klientů!");
         }
 
         $this->database->insert(self::TABLE_NAME, [
