@@ -17,7 +17,8 @@
     "ext-json": "*",
     "firebase/php-jwt": "dev-master",
     "ralouphie/getallheaders": "dev-master",
-    "phpmailer/phpmailer": "dev-master"
+    "phpmailer/phpmailer": "dev-master",
+    "erusev/parsedown-extra": "dev-master"
   },
   "autoload": {
     "classmap": [
