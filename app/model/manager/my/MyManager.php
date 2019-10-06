@@ -103,7 +103,7 @@ class MyManager {
         $type = $this->typeToNumber($what);
         $content = $this->database->queryItself("SELECT content FROM informations WHERE type = ?", [$type]);
         $dir = $this->filemanager->getDirectory(FileManager::FOLDER_INFO);
-        $infoFile = FileManager::mergePath($dir, $what) . self::INFO_SUFFIX;
+        $infoFile = FileManager::mergePath($dir, false, $what) . self::INFO_SUFFIX;
         $this->filemanager->writeFile($infoFile, $content);
     }
 

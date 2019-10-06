@@ -4,6 +4,7 @@ namespace app\model\manager\file;
 
 
 use app\model\http\FileEntry;
+use app\model\util\StringUtils;
 use Logger;
 
 /**
@@ -12,7 +13,7 @@ use Logger;
  */
 class FileManager {
 
-    const FOLDER_UPLOADS = "uploads", FOLDER_IMAGE = "image", FOLDER_LECTURES = "lectures", FOLDER_TMP = "tmp", FOLDER_INFO = "info", FOLDER_DOCUMENTS = "documents";
+    const FOLDER_UPLOADS = "uploads", FOLDER_USER_UPLOADS = "user", FOLDER_IMAGE = "image", FOLDER_LECTURES = "lectures", FOLDER_TMP = "tmp", FOLDER_INFO = "info", FOLDER_DOCUMENTS = "documents";
 
     private $logger;
 
@@ -25,30 +26,35 @@ class FileManager {
     }
 
     /**
-     * Inicializace instance
-     */
-    private function init() {
-        $this->folderRoot = $_SERVER['DOCUMENT_ROOT'] . '/';
-
-        $this->folders[self::FOLDER_DOCUMENTS] = $this->folderRoot . "/app/documents/";
-        $this->folders[self::FOLDER_UPLOADS] = $this->folderRoot . "public/uploads/";
-        $this->folders[self::FOLDER_IMAGE] = $this->folders[self::FOLDER_UPLOADS] . "image/";
-        $this->folders[self::FOLDER_LECTURES] = $this->folders[self::FOLDER_UPLOADS] . "lectures/";
-        $this->folders[self::FOLDER_TMP] = $this->folders[self::FOLDER_UPLOADS] . "tmp/";
-        $this->folders[self::FOLDER_INFO] = $this->folders[self::FOLDER_UPLOADS] . "info/";
-
-        foreach ($this->folders as $folder) $this->createDirectory($folder);
-    }
-
-    /**
      * Spojí jednotlivé části cesty pomocí separátoru
      *
      * @param string $path Výchozí cesta
+     * @param bool $separatorToEnd True, pokud chceš přidat na konec zmergované cesty separátor, jinak false
      * @param string ...$paths Další části cesty
      * @return string Výslednou spojenou cestu
      */
-    public static function mergePath(string $path, ...$paths) {
-        return $path . join("/", $paths);
+    public static function mergePath(string $path, bool $separatorToEnd = false, ...$paths) {
+        if (StringUtils::endsWith($path, DIRECTORY_SEPARATOR)) {
+            return $path . join("", $paths) . ($separatorToEnd) ? DIRECTORY_SEPARATOR : "";
+        }
+        return $path . DIRECTORY_SEPARATOR . join(DIRECTORY_SEPARATOR, $paths) . ($separatorToEnd) ? DIRECTORY_SEPARATOR : "";
+    }
+
+    /**
+     * Inicializace instance
+     */
+    private function init() {
+        $this->folderRoot = __PUBLIC_ROOT__ . DIRECTORY_SEPARATOR . "..";
+
+        $this->folders[self::FOLDER_DOCUMENTS] = self::mergePath($this->folderRoot, false, "app", "documents", DIRECTORY_SEPARATOR); // $this->folderRoot ."/app/documents/";
+        $this->folders[self::FOLDER_UPLOADS] = self::mergePath($this->folderRoot, false, "public", "uploads"); // $this->folderRoot . "public/uploads/";
+        $this->folders[self::FOLDER_USER_UPLOADS] = self::mergePath($this->folders[self::FOLDER_UPLOADS], false,  "user");
+        $this->folders[self::FOLDER_IMAGE] = self::mergePath($this->folders[self::FOLDER_UPLOADS], false,  "image");
+        $this->folders[self::FOLDER_LECTURES] = self::mergePath($this->folders[self::FOLDER_UPLOADS], false,  "lectures");
+        $this->folders[self::FOLDER_TMP] = self::mergePath($this->folders[self::FOLDER_UPLOADS], false,  "tmp");
+        $this->folders[self::FOLDER_INFO] = self::mergePath($this->folders[self::FOLDER_UPLOADS], false,  "info");
+
+        foreach ($this->folders as $folder) $this->createDirectory($folder);
     }
 
     /**
@@ -112,21 +118,39 @@ class FileManager {
      * Metoda pro získání obsahu z adresáře
      *
      * @param $dir string Cesta k adresáři
+     * @param string $prefixToRemove
      * @return array Pole souborů
      */
-    public function getFilesFromDirectory($dir) {
-        return array_diff(scandir($dir), array('..', '.'));
+    public function getFilesFromDirectory(string $dir, string $prefixToRemove = "") {
+        $files = array_diff(scandir($dir), array('..', '.'));
+        $stats = [];
+
+        foreach ($files as $file) {
+            $workingFile = self::mergePath($dir, true, $file);
+            $sha = sha1_file($workingFile);
+            echo "Working file: " . $workingFile . "\n" . " Prefix to remove: " . $prefixToRemove;
+            $publicPath = str_replace($prefixToRemove, "", $workingFile);
+            echo "\n Result: " . $publicPath;
+            $stats[$sha] = $publicPath;
+        }
+
+        return $stats;
     }
 
     /**
      * Pomocná metoda pro vytvoření složky, pokud neexistuje
      *
      * @param $path string Cesta ke složce
+     * @param bool $throwException True, pokud se má při nezdaru vyhodit vyjímka
+     * @throws FileManipulationException Pokud se nepodaří vytvořit složku
      */
-    private function createDirectory($path) {
+    public function createDirectory(string $path, bool $throwException = false) {
         if (!file_exists($path)) {
             if (!mkdir($path, 0777, true)) {
                 $this->logger->error("Nepodařilo se vytvořit složku: " . $path);
+                if ($throwException) {
+                    throw new FileManipulationException("Nepodařilo se vytvořit složku: " . $path);
+                }
             }
         }
     }

@@ -27,7 +27,14 @@ class StringUtils {
      * @return bool Zda text začíná podřetězcem
      */
     public static function endsWith($haystack, $needle) {
-        return ((mb_strlen($haystack) >= mb_strlen($needle)) && ((mb_strpos($haystack, $needle, mb_strlen($haystack) - mb_strlen($needle))) !== false));
+        //return ((mb_strlen($haystack) >= mb_strlen($needle)) && ((mb_strpos($haystack, $needle, mb_strlen($haystack) - mb_strlen($needle))) !== false));
+//        return substr_compare($haystack, $needle, -strlen($needle)) === 0;
+        $length = strlen($needle);
+        if ($length == 0) {
+            return true;
+        }
+
+        return (substr($haystack, -$length) === $needle);
     }
 
     /**
