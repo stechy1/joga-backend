@@ -23,7 +23,7 @@ class ParsedownService {
         $this->logger = Logger::getLogger(__CLASS__);
         $this->parsedown = new MyParsedown();
         $this->setBreaksEnabled(true);
-        $this->setMarkupEscaped(false);
+        $this->setMarkupEscaped(true);
         $this->setUrlsLinked(true);
     }
 
@@ -61,7 +61,7 @@ class ParsedownService {
 
     /**
      * Povolení excapování HTML značek ve vstupu
-     * Nastav na false v případě vstupu od uživatele
+     * Nastav na true v případě vstupu od uživatele
      *
      * <div><strong>*Some text*</strong></div>
      * Output: <p>&lt;div>&lt;strong><em>Some text</em>&lts;/strong>&lt;/div></p>
