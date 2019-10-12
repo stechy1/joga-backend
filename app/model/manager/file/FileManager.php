@@ -20,6 +20,10 @@ class FileManager {
     private $folderRoot;
     private $folders;
 
+    /**
+     * FileManager constructor.
+     * @throws FileManipulationException
+     */
     function __construct() {
         $this->logger = Logger::getLogger(__CLASS__);
         $this->init();
@@ -35,18 +39,20 @@ class FileManager {
      */
     public static function mergePath(string $path, bool $separatorToEnd = false, ...$paths) {
         if (StringUtils::endsWith($path, DIRECTORY_SEPARATOR)) {
-            return $path . join("", $paths) . ($separatorToEnd) ? DIRECTORY_SEPARATOR : "";
+            return $path . join("", $paths) . (($separatorToEnd) ? DIRECTORY_SEPARATOR : "");
         }
-        return $path . DIRECTORY_SEPARATOR . join(DIRECTORY_SEPARATOR, $paths) . ($separatorToEnd) ? DIRECTORY_SEPARATOR : "";
+        return $path . DIRECTORY_SEPARATOR . join(DIRECTORY_SEPARATOR, $paths) . (($separatorToEnd) ? DIRECTORY_SEPARATOR : "");
     }
 
     /**
      * Inicializace instance
+     * @throws FileManipulationException
      */
     private function init() {
         $this->folderRoot = __PUBLIC_ROOT__ . DIRECTORY_SEPARATOR . "..";
+        $this->logger->trace("Výchozí složka je inicalizována na: " . $this->folderRoot);
 
-        $this->folders[self::FOLDER_DOCUMENTS] = self::mergePath($this->folderRoot, false, "app", "documents", DIRECTORY_SEPARATOR); // $this->folderRoot ."/app/documents/";
+//        $this->folders[self::FOLDER_DOCUMENTS] = self::mergePath($this->folderRoot, false, "app", "documents"); // $this->folderRoot ."/app/documents/";
         $this->folders[self::FOLDER_UPLOADS] = self::mergePath($this->folderRoot, false, "public", "uploads"); // $this->folderRoot . "public/uploads/";
         $this->folders[self::FOLDER_USER_UPLOADS] = self::mergePath($this->folders[self::FOLDER_UPLOADS], false,  "user");
         $this->folders[self::FOLDER_IMAGE] = self::mergePath($this->folders[self::FOLDER_UPLOADS], false,  "image");
@@ -123,14 +129,13 @@ class FileManager {
      */
     public function getFilesFromDirectory(string $dir, string $prefixToRemove = "") {
         $files = array_diff(scandir($dir), array('..', '.'));
+        $this->logger->trace($dir);
         $stats = [];
 
         foreach ($files as $file) {
             $workingFile = self::mergePath($dir, true, $file);
             $sha = sha1_file($workingFile);
-            echo "Working file: " . $workingFile . "\n" . " Prefix to remove: " . $prefixToRemove;
             $publicPath = str_replace($prefixToRemove, "", $workingFile);
-            echo "\n Result: " . $publicPath;
             $stats[$sha] = $publicPath;
         }
 
@@ -145,6 +150,7 @@ class FileManager {
      * @throws FileManipulationException Pokud se nepodaří vytvořit složku
      */
     public function createDirectory(string $path, bool $throwException = false) {
+        $this->logger->trace("Vytvářím složku: " . $path);
         if (!file_exists($path)) {
             if (!mkdir($path, 0777, true)) {
                 $this->logger->error("Nepodařilo se vytvořit složku: " . $path);
@@ -163,8 +169,10 @@ class FileManager {
      * @throws FileManipulationException Pokud požadovaná složka neexistuje
      */
     public function getDirectory($name) {
+        $this->logger->trace("Hledám složku pod klíčem: " . $name);
         if (!array_key_exists($name, $this->folders)) throw new FileManipulationException('Požadovaná složka neexistuje');
 
+        $this->logger->trace("Našel jsem složku: " . $this->folders[$name]);
         return $this->folders[$name];
     }
 
