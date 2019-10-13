@@ -18,7 +18,8 @@
     "firebase/php-jwt": "dev-master",
     "ralouphie/getallheaders": "dev-master",
     "phpmailer/phpmailer": "dev-master",
-    "erusev/parsedown-extra": "dev-master"
+    "erusev/parsedown-extra": "dev-master",
+    "ext-exif": "*"
   },
   "autoload": {
     "classmap": [

@@ -67,7 +67,7 @@ interface IRequest {
      * @return mixed Obsah na indexu parametru
      * @throws BadQueryStringException Pokud index parametr neukazuje na žádný parametr
      */
-    function getParam(int $index);
+    function getParam(int $index = -1);
 
     /**
      * Zkontroluje, zda-li požadavek obsahuje nějaké parametry

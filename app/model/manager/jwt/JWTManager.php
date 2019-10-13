@@ -15,7 +15,7 @@ class JWTManager {
     const
         JWT_ALGORITHM = "RS256",
         JWT = __APP_ROOT__ ."/config/private.key",
-        JWT_PUBLIC_KEY_PATH = __APP_ROOT__ ."/../public/public.key";
+        JWT_PUBLIC_KEY_PATH = __ROOT__ ."/public/public.key";
 
     /**
      * @var Logger

@@ -49,7 +49,8 @@ class FileManager {
      * @throws FileManipulationException
      */
     private function init() {
-        $this->folderRoot = __PUBLIC_ROOT__ . DIRECTORY_SEPARATOR . "..";
+        //$this->folderRoot = __PUBLIC_ROOT__ . DIRECTORY_SEPARATOR . "..";
+        $this->folderRoot = __ROOT__;
         $this->logger->trace("Výchozí složka je inicalizována na: " . $this->folderRoot);
 
 //        $this->folders[self::FOLDER_DOCUMENTS] = self::mergePath($this->folderRoot, false, "app", "documents"); // $this->folderRoot ."/app/documents/";
@@ -129,14 +130,22 @@ class FileManager {
      */
     public function getFilesFromDirectory(string $dir, string $prefixToRemove = "") {
         $files = array_diff(scandir($dir), array('..', '.'));
+
         $this->logger->trace($dir);
         $stats = [];
 
         foreach ($files as $file) {
-            $workingFile = self::mergePath($dir, true, $file);
-            $sha = sha1_file($workingFile);
-            $publicPath = str_replace($prefixToRemove, "", $workingFile);
-            $stats[$sha] = $publicPath;
+            $record = [];
+            $workingFile = self::mergePath($dir, false, $file);
+            $record["name"] = $file;
+            $this->logger->debug($workingFile);
+            $record["path"] = str_replace($prefixToRemove, "", $workingFile);
+            $record["isDirectory"] = is_dir($workingFile);
+            $record["isImage"] = $record["isDirectory"] ? false : exif_imagetype($workingFile);
+            $record["hash"] = $record["isDirectory"] ? "" : sha1_file($workingFile);
+            $record["extention"] = $record["isDirectory"] ? "" : pathinfo($workingFile, PATHINFO_EXTENSION);
+            $record["selected"] = false;
+            $stats[] = $record;
         }
 
         return $stats;
