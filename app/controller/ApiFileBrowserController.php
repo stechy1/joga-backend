@@ -118,7 +118,7 @@ class ApiFileBrowserController extends BaseApiController {
             $userNewSubfolder = FileManager::mergePath($userSubfolder, false, $newFolderName);
 
             $this->filemanager->createDirectory($userNewSubfolder, true);
-            $files = $this->filemanager->getFilesFromDirectory($userNewSubfolder, $this->usersUploads . DIRECTORY_SEPARATOR);
+            $files = $this->filemanager->getFilesFromDirectory($userSubfolder, $this->usersUploads . DIRECTORY_SEPARATOR);
             $response->addData("files", $files);
         } catch (FileManipulationException $ex) {
             $this->logger->error($ex->getMessage());
