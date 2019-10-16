@@ -84,6 +84,7 @@ class MyManager {
      * @throws Exception Pokud se něco nepovede
      */
     public function save(string $what, string $content) {
+        $this->logger->info("Aktualizuji obsah " . $what . " na: " . $content);
         $type = $this->typeToNumber($what);
         $count = $this->database->update(self::TABLE_NAME, [self::COLUMN_INFO_CONTENT => $content], "WHERE type = ?", [$type]);
         if ($count != 1) {

@@ -55,9 +55,9 @@ interface IRequest {
     /**
      * Vrátí pole nahraných souborů
      *
-     * @return array
+     * @return FileEntry[]
      */
-    function getFiles();
+    function getFiles(): iterable;
 
     /**
      * Vrátí parametr na určitém indexu.

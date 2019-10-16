@@ -6,6 +6,7 @@ namespace app\controller;
 
 use app\middleware\AuthMiddleware;
 use app\model\http\BadQueryStringException;
+use app\model\http\FileEntry;
 use app\model\http\IRequest;
 use app\model\http\IResponse;
 use app\model\manager\file\FileManager;
@@ -67,14 +68,10 @@ class ApiFileBrowserController extends BaseApiController {
 
 
     public function defaultGETAction(IRequest $request, IResponse $response) {
-        $subfolder = "";
-        try {
-            $subfolder = $request->getParam(0);
-        } catch (BadQueryStringException $e) {}
-//        }
+        $subfolders = $request->getParam();
 
         try {
-            $userSubfolder = FileManager::mergePath($this->userUploads, false, $subfolder);
+            $userSubfolder = FileManager::mergePath($this->userUploads, false, ...$subfolders);
             $this->filemanager->createDirectory($userSubfolder, true);
             $files = $this->filemanager->getFilesFromDirectory($userSubfolder, $this->usersUploads . DIRECTORY_SEPARATOR);
             $response->addData("files", $files);
@@ -85,23 +82,62 @@ class ApiFileBrowserController extends BaseApiController {
         }
     }
 
-    public function defaultPUTAction(IRequest $request, IResponse $response) {
-        $subFolders = $request->getParam();
-        var_dump($subFolders);
-        $existingSubfolders = "";
-        foreach ($subFolders as $subFolder) {
-            $existingSubfolders .= ($subFolder . DIRECTORY_SEPARATOR);
-        }
-//        $existingSubfolders = array_slice($_POST, 1);
-//        $newFolderName = $subFolders[sizeof($subFolder)];
+    public function defaultPOSTAction(IRequest $request, IResponse $response) {
+        $subfolders = $request->getParam();
+        /**
+         * @var FileEntry[]
+         */
+        $files = $request->getFiles();
 
         try {
-            $this->logger->debug("Existing subfolders: " . $existingSubfolders);
-//            $userSubfolder = FileManager::mergePath($this->userUploads, false, $existingSubfolders);
-//            $userNewSubfolder = FileManager::mergePath($userSubfolder, false, $newFolderName);
-//            $this->filemanager->createDirectory($userNewSubfolder, true);
-//            $files = $this->filemanager->getFilesFromDirectory($userNewSubfolder, $this->$userSubfolder . DIRECTORY_SEPARATOR);
-//            $response->addData("files", $files);
+            $userSubfolder = FileManager::mergePath($this->userUploads, false, ...$subfolders);
+            $this->filemanager->createDirectory($userSubfolder, true);
+
+            foreach ($files as $file) {
+                if ($this->filemanager->existsFile(FileManager::mergePath($userSubfolder, $file->getName()))) {
+                    throw new FileManipulationException("Soubor: {$file->getName()} již existuje!");
+                }
+                $this->filemanager->moveUploadedFiles($file->getTmpName(), $userSubfolder, $file->getName());
+            }
+            $files = $this->filemanager->getFilesFromDirectory($userSubfolder, $this->usersUploads . DIRECTORY_SEPARATOR);
+            $response->addData("files", $files);
+        } catch (FileManipulationException $ex) {
+            $this->logger->error($ex->getMessage());
+            $response->setCode(StatusCodes::BAD_REQUEST);
+            $this->setResponseMessage($ex->getMessage(), Constants::RESPONSE_MESSAGE_TYPE_ERROR);
+        }
+    }
+
+    public function defaultPUTAction(IRequest $request, IResponse $response) {
+        $subfolders = $request->getParam();
+        $existingSubfolders = array_slice($_POST, 1);
+        $newFolderName = $subfolders[sizeof($subfolders) - 1];
+
+        try {
+            $userSubfolder = FileManager::mergePath($this->userUploads, false, ...$existingSubfolders);
+            $userNewSubfolder = FileManager::mergePath($userSubfolder, false, $newFolderName);
+
+            $this->filemanager->createDirectory($userNewSubfolder, true);
+            $files = $this->filemanager->getFilesFromDirectory($userNewSubfolder, $this->usersUploads . DIRECTORY_SEPARATOR);
+            $response->addData("files", $files);
+        } catch (FileManipulationException $ex) {
+            $this->logger->error($ex->getMessage());
+            $response->setCode(StatusCodes::BAD_REQUEST);
+            $this->setResponseMessage($ex->getMessage(), Constants::RESPONSE_MESSAGE_TYPE_ERROR);
+        }
+    }
+
+    public function defaultDELETEAction(IRequest $request, IResponse $response) {
+        $subfolders = $request->getParam();
+        $existingSubfolders = array_slice($_POST, 1);
+        $folderForDelete = $subfolders[sizeof($subfolders) - 1];
+
+        try {
+            $userSubfolder = FileManager::mergePath($this->userUploads, false, ...$existingSubfolders);
+            $userFolderFileForDelete = FileManager::mergePath($userSubfolder, false, $folderForDelete);
+            $this->filemanager->recursiveDelete($userFolderFileForDelete);
+            $files = $this->filemanager->getFilesFromDirectory($userSubfolder, $this->usersUploads . DIRECTORY_SEPARATOR);
+            $response->addData("files", $files);
         } catch (FileManipulationException $ex) {
             $this->logger->error($ex->getMessage());
             $response->setCode(StatusCodes::BAD_REQUEST);

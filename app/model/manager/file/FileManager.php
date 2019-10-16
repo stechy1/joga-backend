@@ -67,21 +67,24 @@ class FileManager {
     /**
      * Metoda rekurzivně projede zadanou cestu a smaže všechno, co jí příjde do cesty
      *
-     * @param $str string Cesta k souboru/složce
-     * @return bool False, pokud není co smazat, jinak true
+     * @param $parentPath string Cesta k souboru/složce
+     * @throws FileManipulationException Pokud se složka/soubor nepodaří smazat
      */
-    public function recursiveDelete($str) {
-        if (is_file($str)) {
-            return @unlink($str);
-        } elseif (is_dir($str)) {
-            $scan = glob(rtrim($str, '/') . '/*');
+    public function recursiveDelete(string $parentPath) {
+        $this->logger->trace("Mažu vše, co existuje ve složce: ${parentPath}");
+        if (is_file($parentPath)) {
+            if (!@unlink($parentPath)) {
+                throw new FileManipulationException("Soubor ${parentPath} se nepodařilo smazat!");
+            }
+        } elseif (is_dir($parentPath)) {
+            $scan = glob(rtrim($parentPath, '/') . '/*');
             foreach ($scan as $index => $path) {
                 self::recursiveDelete($path);
             }
-            return @rmdir($str);
+            if (!@rmdir($parentPath)) {
+                throw new FileManipulationException("Složka ${parentPath} se nepodařila smazat!");
+            }
         }
-
-        return false;
     }
 
     /**
@@ -129,6 +132,7 @@ class FileManager {
      * @return array Pole souborů
      */
     public function getFilesFromDirectory(string $dir, string $prefixToRemove = "") {
+        $this->logger->debug("Vybírám soubory ze složky: {$dir}.");
         $files = array_diff(scandir($dir), array('..', '.'));
 
         $this->logger->trace($dir);
@@ -137,8 +141,8 @@ class FileManager {
         foreach ($files as $file) {
             $record = [];
             $workingFile = self::mergePath($dir, false, $file);
-            $record["name"] = $file;
-            $this->logger->debug($workingFile);
+            $record["name"] = pathinfo($workingFile, PATHINFO_FILENAME);
+            $this->logger->trace("Nalezl jsem soubor/složku: ${workingFile}.");
             $record["path"] = str_replace($prefixToRemove, "", $workingFile);
             $record["isDirectory"] = is_dir($workingFile);
             $record["isImage"] = $record["isDirectory"] ? false : exif_imagetype($workingFile);
@@ -159,8 +163,8 @@ class FileManager {
      * @throws FileManipulationException Pokud se nepodaří vytvořit složku
      */
     public function createDirectory(string $path, bool $throwException = false) {
-        $this->logger->trace("Vytvářím složku: " . $path);
         if (!file_exists($path)) {
+            $this->logger->trace("Vytvářím složku: " . $path);
             if (!mkdir($path, 0777, true)) {
                 $this->logger->error("Nepodařilo se vytvořit složku: " . $path);
                 if ($throwException) {
@@ -266,5 +270,15 @@ class FileManager {
         }
 
         return $newFile;
+    }
+
+    /**
+     * Zkontroluje, zda-li zadaný soubor existuje
+     *
+     * @param string $path Cesta k testovanému souboru
+     * @return bool True, pokud soubor existuje, jinak false
+     */
+    public function existsFile(string $path): bool {
+        return file_exists($path);
     }
 }

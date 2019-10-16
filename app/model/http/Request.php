@@ -80,8 +80,13 @@ class Request implements IRequest {
         return new FileEntry($this->files[$key]);
     }
 
-    function getFiles() {
-        return $this->files;
+    function getFiles(): iterable {
+        $entries = [];
+        foreach ($this->files as $file) {
+            $entries[] = new FileEntry($file);
+        }
+
+        return $entries;
     }
 
     function getParam(int $index = -1, bool $mandatory = true) {
