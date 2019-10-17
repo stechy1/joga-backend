@@ -263,7 +263,7 @@ class UserManager {
         $dateTime = new DateTime();
         // Získání údajů
         $fromDb = $this->database->queryOne('
-                        SELECT id, password, role, banned, disabled
+                        SELECT id, password, role, banned, disabled, checked
                         FROM users
                         WHERE email = ?
                 ', [$email]);
@@ -288,7 +288,7 @@ class UserManager {
             "WHERE id = ?",
             [$fromDb['id']]);
 
-        return $this->jwtmanager->createJWT(new User($fromDb['id'], $email, $fromDb['role']), $remember);
+        return $this->jwtmanager->createJWT(new User($fromDb['id'], $email, $fromDb['role'], $fromDb['checked']), $remember);
 
     }
 

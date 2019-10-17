@@ -47,11 +47,12 @@ class JWTManager {
         }
         $expire_claim = $time->getTimestamp();
         $token = array(
-            "iss" => $issuer_claim,    // Název vlastníka tokenu (název aplikace)
-            "iat" => $issuedat_claim,  // Timestamp času, kdy byl token vygenerován
-            "exp" => $expire_claim,    // Timestamp času, kdy vyprší platnost tokenu
-            "id" => $user->getId(),    // ID uživatele
-            "role" => $user->getRole() // Role uživatele
+            "iss" => $issuer_claim,         // Název vlastníka tokenu (název aplikace)
+            "iat" => $issuedat_claim,       // Timestamp času, kdy byl token vygenerován
+            "exp" => $expire_claim,         // Timestamp času, kdy vyprší platnost tokenu
+            "id" => $user->getId(),         // ID uživatele
+            "role" => $user->getRole(),     // Role uživatele
+            "checked" => $user->isChecked() // True, pokud je uživatelský účet ověřený, jinak false
         );
         $privKey = $this->readPrivateKey();
         return JWT::encode($token, $privKey, self::JWT_ALGORITHM);
