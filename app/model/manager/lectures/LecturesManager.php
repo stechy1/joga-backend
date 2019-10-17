@@ -188,6 +188,14 @@ class LecturesManager {
         return $fromDb;
     }
 
+    public function clientsOnLecture(int $lectureId) {
+        return $this->database->queryAll(
+            "SELECT users.id, users.email, users.name, created
+                    FROM lecture_reservations
+                            LEFT JOIN users ON users.id = client
+                    WHERE lecture = ?", [$lectureId]);
+    }
+
     /**
      * Aktualizuje lekci
      *

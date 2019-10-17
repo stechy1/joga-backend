@@ -27,6 +27,7 @@ class ApiAdminLecturesController extends AdminBaseController {
     const TRAINERS = "trainers";
     const LECTURE = "lecture";
     const VALID = "valid";
+    const CLIENTS = "clients";
 
     /**
      * @var Logger
@@ -70,7 +71,9 @@ class ApiAdminLecturesController extends AdminBaseController {
 
         try {
             $lecture = $this->lecturesmanager->byId(+$lectureId);
+            $clients = $this->lecturesmanager->clientsOnLecture(+$lectureId);
             $response->addData(self::LECTURE, $lecture);
+            $response->addData(self::CLIENTS, $clients);
         } catch (Exception $ex) {
             $this->logger->error($ex->getMessage());
             $response->setCode(StatusCodes::NOT_FOUND);
