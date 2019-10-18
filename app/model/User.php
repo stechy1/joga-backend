@@ -18,16 +18,11 @@ class User {
      * @var int
      */
     private $role;
-    /**
-     * @var bool
-     */
-    private $checked;
 
-    public function __construct(int $id, string $email, int $role, bool $checked) {
+    public function __construct(int $id, string $email, int $role) {
         $this->id = $id;
         $this->email = $email;
         $this->role = $role;
-        $this->checked = $checked;
     }
 
     /**

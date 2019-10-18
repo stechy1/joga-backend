@@ -52,7 +52,6 @@ class JWTManager {
             "exp" => $expire_claim,         // Timestamp času, kdy vyprší platnost tokenu
             "id" => $user->getId(),         // ID uživatele
             "role" => $user->getRole(),     // Role uživatele
-            "checked" => $user->isChecked() // True, pokud je uživatelský účet ověřený, jinak false
         );
         $privKey = $this->readPrivateKey();
         return JWT::encode($token, $privKey, self::JWT_ALGORITHM);
