@@ -19,7 +19,8 @@
     "ralouphie/getallheaders": "dev-master",
     "phpmailer/phpmailer": "dev-master",
     "erusev/parsedown-extra": "dev-master",
-    "ext-exif": "*"
+    "ext-exif": "*",
+    "google/recaptcha": "^1.2"
   },
   "autoload": {
     "classmap": [

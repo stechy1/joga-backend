@@ -16,6 +16,7 @@ use app\model\manager\lectures\LecturesManager;
 use app\model\util\StatusCodes;
 use Exception;
 use Logger;
+use ReCaptcha\ReCaptcha;
 
 /**
  * Class ApiGeneralController
@@ -117,8 +118,17 @@ class ApiGeneralController extends BaseApiController {
         $message = $request->get(self::EMAIL_CONTENT);
         $name = $request->get(self::EMAIL_NAME);
         $emailFrom = $request->get(self::EMAIL_FROM_EMAIL);
-        $recaptcha = $response->get(self::EMAIL_RECAPTCHA);
+        $recaptchaToken = $response->get(self::EMAIL_RECAPTCHA);
 
+        $this->logger->trace("Kontroluji captchu...");
+        $recaptcha = new ReCaptcha(RECAPTCHA);
+        $recaptchaResponse = $recaptcha->verify($recaptchaToken);
+        if (!$recaptchaResponse->isSuccess()) {
+            $this->setResponseMessage("Google captcha se nepodařilo ověřit!");
+            $response->setCode(StatusCodes::BAD_REQUEST);
+            return;
+        }
+        $this->logger->trace("Captcha byla úspěšně ověřena, jdu odeslat e-mail.");
         
 
         try {
