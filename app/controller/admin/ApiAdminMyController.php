@@ -57,6 +57,7 @@ class ApiAdminMyController extends AdminBaseController {
         if ($what == MyManager::INFO_TYPE_MY || $what == MyManager::INFO_TYPE_STUDIO) {
             try {
                 $this->mymanager->save($what, $request->get(MyManager::COLUMN_INFO_CONTENT));
+                $this->setResponseMessage("Informace byly úspěšně uloženy.");
             } catch (Exception $ex) {
                 $this->logger->error($ex->getMessage());
                 $response->setCode(StatusCodes::NOT_FOUND);
@@ -77,6 +78,7 @@ class ApiAdminMyController extends AdminBaseController {
         if ($what == MyManager::INFO_TYPE_MY || $what == MyManager::INFO_TYPE_STUDIO) {
             try {
                 $this->mymanager->publish($what);
+                $this->setResponseMessage("Informace byly úspěšně publikovány.");
             } catch (InfoTypeConversionException | FileManipulationException $ex) {
                 $this->logger->error($ex->getMessage(), $ex);
                 $response->setCode(StatusCodes::NOT_FOUND);

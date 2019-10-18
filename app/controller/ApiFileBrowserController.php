@@ -101,6 +101,7 @@ class ApiFileBrowserController extends BaseApiController {
             }
             $files = $this->filemanager->getFilesFromDirectory($userSubfolder, $this->usersUploads . DIRECTORY_SEPARATOR);
             $response->addData("files", $files);
+            $this->setResponseMessage("Všechny soubory byly úspěšně nahrány.");
         } catch (FileManipulationException $ex) {
             $this->logger->error($ex->getMessage());
             $response->setCode(StatusCodes::BAD_REQUEST);
@@ -120,6 +121,7 @@ class ApiFileBrowserController extends BaseApiController {
             $this->filemanager->createDirectory($userNewSubfolder, true);
             $files = $this->filemanager->getFilesFromDirectory($userSubfolder, $this->usersUploads . DIRECTORY_SEPARATOR);
             $response->addData("files", $files);
+            $this->setResponseMessage("Složka byla úspěšně vytvořena.");
         } catch (FileManipulationException $ex) {
             $this->logger->error($ex->getMessage());
             $response->setCode(StatusCodes::BAD_REQUEST);
@@ -138,6 +140,7 @@ class ApiFileBrowserController extends BaseApiController {
             $this->filemanager->recursiveDelete($userFolderFileForDelete);
             $files = $this->filemanager->getFilesFromDirectory($userSubfolder, $this->usersUploads . DIRECTORY_SEPARATOR);
             $response->addData("files", $files);
+            $this->setResponseMessage("Soubor/složka byla úspěšně smazána.");
         } catch (FileManipulationException $ex) {
             $this->logger->error($ex->getMessage());
             $response->setCode(StatusCodes::BAD_REQUEST);

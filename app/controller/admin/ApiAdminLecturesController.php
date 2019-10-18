@@ -132,6 +132,7 @@ class ApiAdminLecturesController extends AdminBaseController {
 
             $response->addData(self::LECTURE, $lecture);
             $response->setCode(StatusCodes::CREATED);
+            $this->setResponseMessage("Nová lekce byla vytvořena. Nezapomeňte ji publikovat!");
         } catch (Exception $ex) {
             $this->logger->error($ex->getMessage());
             $this->logger->debug($ex->getTraceAsString());

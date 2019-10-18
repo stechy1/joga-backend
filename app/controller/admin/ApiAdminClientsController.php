@@ -38,8 +38,8 @@ class ApiAdminClientsController extends AdminBaseController {
     public function defaultPOSTAction(IRequest $request, IResponse $response) {
         try {
             $clients = $this->usermanager->all(
-                $request->get(self::KEY_POST_ALL_COUNT, 10),
-                $request->get(self::KEY_POST_ALL_FROM, -1)
+                $request->get(self::KEY_POST_ALL_COUNT, false, 10),
+                $request->get(self::KEY_POST_ALL_FROM, false, -1)
             );
             $response->addData(self::KEY_POST_ALL_CLIENTS, $clients);
             $this->logger->trace($clients);

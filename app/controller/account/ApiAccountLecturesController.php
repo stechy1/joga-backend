@@ -58,7 +58,7 @@ class ApiAccountLecturesController extends BaseAccountController {
 
         try {
             $this->lecturereservationsmanager->reserve($clientId, $lectureId);
-
+            $this->setResponseMessage("Přihlášení na lekci proběhlo v pořádku.");
         } catch (LectureException|LectureReservationException $ex) {
             $this->logger->error($ex->getMessage());
             $response->setCode(StatusCodes::NOT_FOUND);
@@ -73,7 +73,7 @@ class ApiAccountLecturesController extends BaseAccountController {
 
         try {
             $this->lecturereservationsmanager->cancel($clientId, $lectureId);
-
+            $this->setResponseMessage("Odhlášení z lekce proběhlo v pořádku.");
         } catch (LectureReservationException $ex) {
             $this->logger->error($ex->getMessage());
             $response->setCode(StatusCodes::NOT_FOUND);
