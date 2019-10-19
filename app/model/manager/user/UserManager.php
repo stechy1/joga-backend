@@ -90,7 +90,7 @@ class UserManager {
         $this->logger->trace('Count: ' . $count);
 
         $params = [];
-        $query = "SELECT users.id, users.email, users.role FROM users";
+        $query = "SELECT id, email, role, name FROM users";
         if ($from > -1) {
             $query .= " WHERE users.id <= ?";
             $params[] = $from;
